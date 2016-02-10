@@ -1,2 +1,2 @@
-# TetrisMultiplayer
-Tetris Multiplayer Application
+# TetrisMultiplayerServer
+Tetris Multiplayer Server Application
