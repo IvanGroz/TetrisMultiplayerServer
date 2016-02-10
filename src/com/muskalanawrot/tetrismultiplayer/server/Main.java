@@ -1,33 +1,24 @@
 package com.muskalanawrot.tetrismultiplayer.server;
 
-import javax.swing.JFrame;
-
-import com.muskalanawrot.tetrismultiplayer.server.gui.MainPanel;
+import com.muskalanawrot.tetrismultiplayer.server.gui.frame.MainFrame;
 
 public class Main implements Runnable
 {
-    private MainPanel mainPanel;
-    private JFrame mainFrame;
+    private MainFrame mainFrame;
 
     public Main()
     {
-	this.mainPanel = new MainPanel();
-	this.mainFrame = new JFrame();
+	this.mainFrame = new MainFrame();
     }
 
     public static void main(String args[])
     {
-	new Thread(new Main()).start();
+	new Main().run();
     }
 
     @Override
     public void run()
     {
-	mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	mainFrame.setBounds(100, 100, 793, 495);
-	mainFrame.setTitle("Tetris Multiplayer - Server");
-	mainFrame.setContentPane(mainPanel);
-	mainFrame.setResizable(false);
 	mainFrame.setVisible(true);
     }
 }
