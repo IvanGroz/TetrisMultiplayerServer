@@ -18,6 +18,7 @@ public class ConnectionsFrame extends JFrame
 	setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	connectionsPanel = new ConnectionsPanel();
 	setContentPane(connectionsPanel);
+	setTitle("Polaczenia");
 	setSize(500,400);
 	setLocationRelativeTo(null);
     }

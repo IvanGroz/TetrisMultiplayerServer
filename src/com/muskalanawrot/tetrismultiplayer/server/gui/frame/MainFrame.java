@@ -1,8 +1,8 @@
 package com.muskalanawrot.tetrismultiplayer.server.gui.frame;
 
-import javax.persistence.EntityManagerFactory;
 import javax.swing.JFrame;
 
+import com.muskalanawrot.tetrismultiplayer.server.Main;
 import com.muskalanawrot.tetrismultiplayer.server.gui.panel.MainPanel;
 
 public class MainFrame extends JFrame
@@ -11,9 +11,9 @@ public class MainFrame extends JFrame
 
     private MainPanel mainPanel;
 
-    public MainFrame(EntityManagerFactory entityManagerFactory)
+    public MainFrame(Main main)
     {
-	mainPanel = new MainPanel(entityManagerFactory);
+	mainPanel = new MainPanel(main);
 	init();
     }
 

@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 import javax.persistence.EntityManagerFactory;
 
 import com.muskalanawrot.tetrismultiplayer.server.database.ConnectToDB;
+import com.muskalanawrot.tetrismultiplayer.server.engine.MainServerThread;
 import com.muskalanawrot.tetrismultiplayer.server.gui.frame.MainFrame;
 import com.muskalanawrot.tetrismultiplayer.server.gui.panel.MainPanel;
 
@@ -15,10 +16,11 @@ public class Main implements Runnable
     private MainFrame mainFrame;
     private EntityManagerFactory entityManagerFactory;
     private MainPanel mainPanel;
+    private MainServerThread mainServerThread;
 
-    public Main()
+    private Main()
     {
-	this.mainFrame = new MainFrame(entityManagerFactory);
+	this.mainFrame = new MainFrame(this);
 	this.mainPanel = mainFrame.getMainPanel();
     }
 
@@ -69,5 +71,25 @@ public class Main implements Runnable
 	});
 	mainPanel.writeLineInTextArea("Trwa laczenie z baza danych.");
 	task.execute();
+    }
+
+    public MainServerThread getMainServerThread()
+    {
+	return mainServerThread;
+    }
+
+    public void setMainServerThread(MainServerThread mainServerThread)
+    {
+	this.mainServerThread = mainServerThread;
+    }
+
+    public EntityManagerFactory getEntityManagerFactory()
+    {
+        return entityManagerFactory;
+    }
+
+    public MainPanel getMainPanel()
+    {
+        return mainPanel;
     }
 }

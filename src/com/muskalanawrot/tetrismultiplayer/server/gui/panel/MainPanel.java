@@ -16,6 +16,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.text.DefaultCaret;
 
+import com.muskalanawrot.tetrismultiplayer.server.Main;
 import com.muskalanawrot.tetrismultiplayer.server.gui.actionlistener.ConnectionsActionListener;
 import com.muskalanawrot.tetrismultiplayer.server.gui.actionlistener.RankingActionListener;
 import com.muskalanawrot.tetrismultiplayer.server.gui.actionlistener.SettingsActionListener;
@@ -33,6 +34,7 @@ public class MainPanel extends JPanel
     private static final long serialVersionUID = 7747975451919372923L;
 
     private EntityManagerFactory entityManagerFactory;
+    private Main main;
 
     private JTextField ipTextField;
     private JTextField portTextField;
@@ -63,9 +65,10 @@ public class MainPanel extends JPanel
     /**
      * Constructor of MainPanel class creating main panel and initializing all elements.
      */
-    public MainPanel(EntityManagerFactory entityManagerFactory)
+    public MainPanel(Main main)
     {
-	this.entityManagerFactory = entityManagerFactory;
+	this.main = main;
+
 	setLayout(null);
 	setBackground(Color.DARK_GRAY);
 
@@ -144,8 +147,8 @@ public class MainPanel extends JPanel
     private void setActionListeners()
     {
 	btnSettings.addActionListener(new SettingsActionListener());
-	btnStart.addActionListener(new StartActionListener(this));
-	btnStop.addActionListener(new StopActionListener());
+	btnStart.addActionListener(new StartActionListener(main));
+	btnStop.addActionListener(new StopActionListener(main));
 	btnRanking.addActionListener(new RankingActionListener());
 	btnConnections.addActionListener(new ConnectionsActionListener());
     }
@@ -196,26 +199,31 @@ public class MainPanel extends JPanel
 
 	portTextField.setBounds(100, 180, 170, 26);
 	portTextField.setColumns(10);
+	portTextField.setText("65534");
 
 	activePlayersTextField.setBounds(184, 272, 86, 20);
 	activePlayersTextField.setColumns(10);
 	activePlayersTextField.setEditable(false);
 	activePlayersTextField.setBackground(Color.WHITE);
+	activePlayersTextField.setText("0");
 
 	activeGamesTextField.setBounds(184, 303, 86, 20);
 	activeGamesTextField.setColumns(10);
 	activeGamesTextField.setEditable(false);
 	activeGamesTextField.setBackground(Color.WHITE);
+	activeGamesTextField.setText("0");
 
 	allPlayersTextField.setBounds(184, 352, 86, 20);
 	allPlayersTextField.setColumns(10);
 	allPlayersTextField.setEditable(false);
 	allPlayersTextField.setBackground(Color.WHITE);
+	allPlayersTextField.setText("0");
 
 	allGamesTextField.setBounds(184, 383, 86, 20);
 	allGamesTextField.setColumns(10);
 	allGamesTextField.setEditable(false);
 	allGamesTextField.setBackground(Color.WHITE);
+	allGamesTextField.setText("0");
 
 	separator_1.setBounds(0, 52, 292, 1);
 	separator_1.setForeground(Color.BLACK);
@@ -340,6 +348,36 @@ public class MainPanel extends JPanel
 
     public EntityManagerFactory getEntityManagerFactory()
     {
-        return entityManagerFactory;
+	return entityManagerFactory;
     }
+
+    public JTextField getIpTextField()
+    {
+	return ipTextField;
+    }
+
+    public JTextField getPortTextField()
+    {
+	return portTextField;
+    }
+
+    public JTextField getActivePlayersTextField()
+    {
+	return activePlayersTextField;
+    }
+
+    public JTextField getActiveGamesTextField()
+    {
+	return activeGamesTextField;
+    }
+
+    public JTextField getAllPlayersTextField()
+    {
+	return allPlayersTextField;
+    }
+
+    public JTextField getAllGamesTextField()
+    {
+	return allGamesTextField;
+    }    
 }
