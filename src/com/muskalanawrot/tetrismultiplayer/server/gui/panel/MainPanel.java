@@ -181,7 +181,7 @@ public class MainPanel extends JPanel
 	btnRanking.setBackground(Color.WHITE);
 	btnRanking.setEnabled(false);
 
-	btnConnections.setBounds(100, 48, 97, 30);
+	btnConnections.setBounds(100, 64, 97, 30);
 	btnConnections.setBackground(Color.WHITE);
 	btnConnections.setEnabled(false);
 
@@ -213,7 +213,7 @@ public class MainPanel extends JPanel
 	allGamesTextField.setEditable(false);
 	allGamesTextField.setBackground(Color.WHITE);
 
-	separator_1.setBounds(0, 87, 292, 1);
+	separator_1.setBounds(0, 52, 292, 1);
 	separator_1.setForeground(Color.BLACK);
 
 	separator_2.setBounds(0, 217, 292, 1);
@@ -302,6 +302,16 @@ public class MainPanel extends JPanel
     public void setStopBtnStatus(boolean isActive)
     {
 	btnStop.setEnabled(isActive);
+    }
+    
+    /**
+     * Sets ranking button enabled value to selected state.
+     * 
+     * @param isActive true if button should be enabled.
+     */
+    public void setRankingBtnStatus(boolean isActive)
+    {
+	btnRanking.setEnabled(isActive);
     }
 
     /**
