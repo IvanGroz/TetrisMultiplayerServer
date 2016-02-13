@@ -1,5 +1,6 @@
 package com.muskalanawrot.tetrismultiplayer.server.gui.frame;
 
+import javax.persistence.EntityManagerFactory;
 import javax.swing.JFrame;
 
 import com.muskalanawrot.tetrismultiplayer.server.gui.panel.MainPanel;
@@ -10,16 +11,17 @@ public class MainFrame extends JFrame
 
     private MainPanel mainPanel;
 
-    public MainFrame()
+    public MainFrame(EntityManagerFactory entityManagerFactory)
     {
-	mainPanel = new MainPanel();
+	mainPanel = new MainPanel(entityManagerFactory);
 	init();
     }
 
     public void init()
     {
 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	setBounds(100, 100, 745, 468);
+	setSize(745, 468);
+	setLocationRelativeTo(null);
 	setTitle("Tetris Multiplayer - Server");
 	setContentPane(mainPanel);
 	setResizable(false);

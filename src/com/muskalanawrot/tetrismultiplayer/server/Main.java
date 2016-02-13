@@ -18,7 +18,7 @@ public class Main implements Runnable
 
     public Main()
     {
-	this.mainFrame = new MainFrame();
+	this.mainFrame = new MainFrame(entityManagerFactory);
 	this.mainPanel = mainFrame.getMainPanel();
     }
 
@@ -67,6 +67,7 @@ public class Main implements Runnable
 		}
 	    }
 	});
+	mainPanel.writeLineInTextArea("Trwa laczenie z baza danych.");
 	task.execute();
     }
 }

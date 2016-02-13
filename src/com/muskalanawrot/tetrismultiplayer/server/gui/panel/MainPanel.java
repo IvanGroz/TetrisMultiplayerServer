@@ -3,6 +3,7 @@ package com.muskalanawrot.tetrismultiplayer.server.gui.panel;
 import java.awt.Color;
 import java.awt.Font;
 
+import javax.persistence.EntityManagerFactory;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -30,6 +31,8 @@ import com.muskalanawrot.tetrismultiplayer.server.gui.actionlistener.StopActionL
 public class MainPanel extends JPanel
 {
     private static final long serialVersionUID = 7747975451919372923L;
+
+    private EntityManagerFactory entityManagerFactory;
 
     private JTextField ipTextField;
     private JTextField portTextField;
@@ -60,8 +63,9 @@ public class MainPanel extends JPanel
     /**
      * Constructor of MainPanel class creating main panel and initializing all elements.
      */
-    public MainPanel()
+    public MainPanel(EntityManagerFactory entityManagerFactory)
     {
+	this.entityManagerFactory = entityManagerFactory;
 	setLayout(null);
 	setBackground(Color.DARK_GRAY);
 
@@ -140,7 +144,7 @@ public class MainPanel extends JPanel
     private void setActionListeners()
     {
 	btnSettings.addActionListener(new SettingsActionListener());
-	btnStart.addActionListener(new StartActionListener());
+	btnStart.addActionListener(new StartActionListener(this));
 	btnStop.addActionListener(new StopActionListener());
 	btnRanking.addActionListener(new RankingActionListener());
 	btnConnections.addActionListener(new ConnectionsActionListener());
@@ -218,7 +222,7 @@ public class MainPanel extends JPanel
 
 	separator_2.setBounds(0, 217, 292, 1);
 	separator_2.setForeground(Color.BLACK);
-	
+
 	lblFinishedGames.setBounds(76, 380, 98, 26);
 	lblAllPlayersNumber.setBounds(76, 349, 78, 26);
 	lblAll.setBounds(23, 330, 54, 26);
@@ -303,7 +307,7 @@ public class MainPanel extends JPanel
     {
 	btnStop.setEnabled(isActive);
     }
-    
+
     /**
      * Sets ranking button enabled value to selected state.
      * 
@@ -332,5 +336,10 @@ public class MainPanel extends JPanel
     public void setConnectionsBtnStatus(boolean isActive)
     {
 	btnConnections.setEnabled(isActive);
+    }
+
+    public EntityManagerFactory getEntityManagerFactory()
+    {
+        return entityManagerFactory;
     }
 }
