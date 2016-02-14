@@ -2,6 +2,9 @@ package com.muskalanawrot.tetrismultiplayer.server.gui.panel;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.persistence.EntityManagerFactory;
 import javax.swing.BorderFactory;
@@ -61,6 +64,7 @@ public class MainPanel extends JPanel
     private JTextField allGamesTextField;
     private JScrollPane scroll;
     private JButton btnConnections;
+    private Lock textAreaLock;
 
     /**
      * Constructor of MainPanel class creating main panel and initializing all elements.
@@ -68,7 +72,7 @@ public class MainPanel extends JPanel
     public MainPanel(Main main)
     {
 	this.main = main;
-
+	this.textAreaLock = new ReentrantLock();
 	setLayout(null);
 	setBackground(Color.DARK_GRAY);
 
@@ -130,7 +134,7 @@ public class MainPanel extends JPanel
 
 	leftPanel.add(separator_2);
 	leftPanel.add(separator_1);
-	
+
 	leftPanel.add(lblServerIp);
 	leftPanel.add(lblPort);
 	leftPanel.add(lblStatistics);
@@ -197,34 +201,40 @@ public class MainPanel extends JPanel
 	ipTextField.setColumns(10);
 	ipTextField.setEditable(false);
 	ipTextField.setBackground(Color.WHITE);
+	ipTextField.setHorizontalAlignment(JTextField.CENTER);
 
 	portTextField.setBounds(100, 180, 170, 26);
 	portTextField.setColumns(10);
 	portTextField.setText("65534");
+	portTextField.setHorizontalAlignment(JTextField.CENTER);
 
 	activePlayersTextField.setBounds(184, 272, 86, 20);
 	activePlayersTextField.setColumns(10);
 	activePlayersTextField.setEditable(false);
 	activePlayersTextField.setBackground(Color.WHITE);
 	activePlayersTextField.setText("0");
+	activePlayersTextField.setHorizontalAlignment(JTextField.CENTER);
 
 	activeGamesTextField.setBounds(184, 303, 86, 20);
 	activeGamesTextField.setColumns(10);
 	activeGamesTextField.setEditable(false);
 	activeGamesTextField.setBackground(Color.WHITE);
 	activeGamesTextField.setText("0");
+	activeGamesTextField.setHorizontalAlignment(JTextField.CENTER);
 
 	allPlayersTextField.setBounds(184, 352, 86, 20);
 	allPlayersTextField.setColumns(10);
 	allPlayersTextField.setEditable(false);
 	allPlayersTextField.setBackground(Color.WHITE);
 	allPlayersTextField.setText("0");
+	allPlayersTextField.setHorizontalAlignment(JTextField.CENTER);
 
 	allGamesTextField.setBounds(184, 383, 86, 20);
 	allGamesTextField.setColumns(10);
 	allGamesTextField.setEditable(false);
 	allGamesTextField.setBackground(Color.WHITE);
 	allGamesTextField.setText("0");
+	allGamesTextField.setHorizontalAlignment(JTextField.CENTER);
 
 	separator_1.setBounds(0, 52, 292, 1);
 	separator_1.setForeground(Color.BLACK);
@@ -250,11 +260,20 @@ public class MainPanel extends JPanel
      */
     public void writeLineInTextArea(String newLine)
     {
-	if (!textArea.getText().isEmpty())
+	try
 	{
-	    newLine = "\n" + newLine;
+	    textAreaLock.tryLock(3, TimeUnit.SECONDS);
+	    if (!textArea.getText().isEmpty())
+	    {
+		newLine = "\n" + newLine;
+	    }
+	    textArea.append(newLine);
+	    textAreaLock.unlock();
 	}
-	textArea.append(newLine);
+	catch (InterruptedException e)
+	{
+	    e.printStackTrace();
+	}
     }
 
     /**
@@ -262,9 +281,12 @@ public class MainPanel extends JPanel
      * 
      * @param activePlayersNumber
      */
-    public void setActivePlayersNumber(String activePlayersNumber)
+    public void setActivePlayersNumber(Integer activePlayersNumber)
     {
-	activePlayersTextField.setText(activePlayersNumber);
+	synchronized(activePlayersTextField)
+	{
+	    activePlayersTextField.setText(activePlayersNumber.toString());
+	}
     }
 
     /**
@@ -272,9 +294,9 @@ public class MainPanel extends JPanel
      * 
      * @param activeGamesNumber
      */
-    public void setActiveGamesNumber(String activeGamesNumber)
+    public void setActiveGamesNumber(Integer activeGamesNumber)
     {
-	activeGamesTextField.setText(activeGamesNumber);
+	activeGamesTextField.setText(activeGamesNumber.toString());
     }
 
     /**
@@ -380,5 +402,5 @@ public class MainPanel extends JPanel
     public JTextField getAllGamesTextField()
     {
 	return allGamesTextField;
-    }    
+    }
 }

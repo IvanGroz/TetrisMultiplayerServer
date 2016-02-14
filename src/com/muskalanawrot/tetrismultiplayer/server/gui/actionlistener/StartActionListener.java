@@ -25,7 +25,7 @@ public class StartActionListener implements ActionListener
 	    serverPort = Integer.parseInt(main.getMainPanel().getPortTextField().getText());
 	    if (serverPort <= 49152 || serverPort >= 65535) throw new NumberFormatException();
 
-	    MainServerThread mainServerThread = new MainServerThread(main, serverPort);
+	    MainServerThread mainServerThread = new MainServerThread(main, serverPort, 1);
 	    main.setMainServerThread(mainServerThread);
 	    mainServerThread.execute();
 	    main.getMainPanel().writeLineInTextArea("Uruchomiono serwer gry.");

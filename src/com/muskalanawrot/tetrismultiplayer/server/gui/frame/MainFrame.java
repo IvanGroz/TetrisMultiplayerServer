@@ -1,5 +1,8 @@
 package com.muskalanawrot.tetrismultiplayer.server.gui.frame;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
 import javax.swing.JFrame;
 
 import com.muskalanawrot.tetrismultiplayer.server.Main;
@@ -10,10 +13,12 @@ public class MainFrame extends JFrame
     private static final long serialVersionUID = -6903076602874962620L;
 
     private MainPanel mainPanel;
+    private Main main;
 
     public MainFrame(Main main)
     {
-	mainPanel = new MainPanel(main);
+	this.main = main;
+	this.mainPanel = new MainPanel(main);
 	init();
     }
 
@@ -26,6 +31,61 @@ public class MainFrame extends JFrame
 	setContentPane(mainPanel);
 	setResizable(false);
 	setVisible(true);
+	addWindowListener(new WindowListener()
+	{
+
+	    @Override
+	    public void windowOpened(WindowEvent e)
+	    {
+		// TODO Auto-generated method stub
+
+	    }
+
+	    @Override
+	    public void windowClosing(WindowEvent e)
+	    {
+		// TODO Auto-generated method stub
+
+	    }
+
+	    @Override
+	    public void windowClosed(WindowEvent e)
+	    {
+		if (main.getEntityManagerFactory().isOpen())
+		{
+		    main.getEntityManagerFactory().close();
+		}
+	    }
+
+	    @Override
+	    public void windowIconified(WindowEvent e)
+	    {
+		// TODO Auto-generated method stub
+
+	    }
+
+	    @Override
+	    public void windowDeiconified(WindowEvent e)
+	    {
+		// TODO Auto-generated method stub
+
+	    }
+
+	    @Override
+	    public void windowActivated(WindowEvent e)
+	    {
+		// TODO Auto-generated method stub
+
+	    }
+
+	    @Override
+	    public void windowDeactivated(WindowEvent e)
+	    {
+		// TODO Auto-generated method stub
+
+	    }
+
+	});
     }
 
     public MainPanel getMainPanel()

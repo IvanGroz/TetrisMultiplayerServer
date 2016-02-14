@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import com.muskalanawrot.tetrismultiplayer.server.Main;
+import com.muskalanawrot.tetrismultiplayer.server.gui.panel.MainPanel;
 
 public class StopActionListener implements ActionListener
 {
@@ -18,10 +19,15 @@ public class StopActionListener implements ActionListener
     public void actionPerformed(ActionEvent e)
     {
 	main.getMainServerThread().cancel(true);
-	main.getMainPanel().setStartBtnStatus(true);
-	main.getMainPanel().setStopBtnStatus(false);
-	main.getMainPanel().setConnectionsBtnStatus(false);
-	main.getMainPanel().getPortTextField().setEditable(true);
+	
+	MainPanel mainPanel = main.getMainPanel();
+	
+	mainPanel.setStartBtnStatus(true);
+	mainPanel.setStopBtnStatus(false);
+	mainPanel.setConnectionsBtnStatus(false);
+	mainPanel.getPortTextField().setEditable(true);
+	mainPanel.setActiveGamesNumber(0);
+	mainPanel.setActivePlayersNumber(0);
     }
 
 }
