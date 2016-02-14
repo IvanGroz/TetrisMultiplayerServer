@@ -130,6 +130,7 @@ public class MainPanel extends JPanel
 
 	leftPanel.add(separator_2);
 	leftPanel.add(separator_1);
+	
 	leftPanel.add(lblServerIp);
 	leftPanel.add(lblPort);
 	leftPanel.add(lblStatistics);

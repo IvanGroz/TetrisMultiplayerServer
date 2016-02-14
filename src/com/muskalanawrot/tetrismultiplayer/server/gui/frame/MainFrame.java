@@ -17,7 +17,7 @@ public class MainFrame extends JFrame
 	init();
     }
 
-    public void init()
+    private void init()
     {
 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	setSize(745, 468);
