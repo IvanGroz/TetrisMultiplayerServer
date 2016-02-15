@@ -1,17 +1,9 @@
 package main.java.com.tetrismultiplayer.server.gui.panel;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 
-public class SettingsPanel extends JPanel
-{
-    private static final long serialVersionUID = -5526316340075340672L;
-
-    /**
-     * Create the panel.
-     */
-    public SettingsPanel()
-    {
-	// TODO: create settings panel
-    }
-
+/**
+ * Created by Marcin on 2016-02-15.
+ */
+public class SettingsPanel extends JPanel {
 }

@@ -1,8 +1,8 @@
 package main.java.com.tetrismultiplayer.server.gui.frame;
 
-import javax.swing.JFrame;
-
 import main.java.com.tetrismultiplayer.server.gui.panel.ConnectionsPanel;
+
+import javax.swing.*;
 
 public class ConnectionsFrame extends JFrame
 {
@@ -15,12 +15,12 @@ public class ConnectionsFrame extends JFrame
      */
     public ConnectionsFrame()
     {
-	setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	connectionsPanel = new ConnectionsPanel();
-	setContentPane(connectionsPanel);
-	setTitle("Polaczenia");
-	setSize(500,400);
-	setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        connectionsPanel = new ConnectionsPanel();
+        setContentPane(connectionsPanel);
+        setTitle("Polaczenia");
+        setSize(500,400);
+        setLocationRelativeTo(null);
     }
 
 }

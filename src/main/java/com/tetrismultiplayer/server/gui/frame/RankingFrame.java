@@ -1,8 +1,8 @@
 package main.java.com.tetrismultiplayer.server.gui.frame;
 
-import javax.swing.JFrame;
-
 import main.java.com.tetrismultiplayer.server.gui.panel.ranking.RankingTabbedPanel;
+
+import javax.swing.*;
 
 public class RankingFrame extends JFrame
 {
@@ -15,12 +15,12 @@ public class RankingFrame extends JFrame
      */
     public RankingFrame()
     {
-	setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	setTitle("Ranking graczy");
-	rankingPanel = new RankingTabbedPanel();
-	setContentPane(rankingPanel);
-	setSize(500,400);
-	setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setTitle("Ranking graczy");
+        rankingPanel = new RankingTabbedPanel();
+        setContentPane(rankingPanel);
+        setSize(500,400);
+        setLocationRelativeTo(null);
     }
 
 }

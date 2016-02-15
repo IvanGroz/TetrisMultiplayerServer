@@ -1,8 +1,8 @@
 package main.java.com.tetrismultiplayer.server.gui.frame;
 
-import javax.swing.JFrame;
-
 import main.java.com.tetrismultiplayer.server.gui.panel.SettingsPanel;
+
+import javax.swing.*;
 
 public class SettingsFrame extends JFrame
 {
@@ -15,12 +15,12 @@ public class SettingsFrame extends JFrame
      */
     public SettingsFrame()
     {
-	setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	setTitle("Ustawienia");
-	settingsPanel = new SettingsPanel();
-	setContentPane(settingsPanel);
-	setSize(500,400);
-	setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setTitle("Ustawienia");
+        settingsPanel = new SettingsPanel();
+        setContentPane(settingsPanel);
+        setSize(500,400);
+        setLocationRelativeTo(null);
     }
 
 }
