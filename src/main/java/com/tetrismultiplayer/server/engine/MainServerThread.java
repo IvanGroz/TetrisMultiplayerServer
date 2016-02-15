@@ -1,12 +1,10 @@
 package main.java.com.tetrismultiplayer.server.engine;
 
-import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
 import main.java.com.tetrismultiplayer.server.Main;
+import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
 import org.json.JSONObject;
 
 import javax.swing.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -36,7 +34,7 @@ public class MainServerThread extends SwingWorker<Object, Object>
         this.maxUserThreads = maxUserThreads;
         this.clientsNumber = new AtomicInteger(0);
         this.userThreadExecutor = Executors.newFixedThreadPool(maxUserThreads);
-        this.userThreadList = new LinkedList<UserServerThread>();
+        this.userThreadList = new LinkedList<>();
     }
 
     @Override
@@ -49,27 +47,21 @@ public class MainServerThread extends SwingWorker<Object, Object>
             while (!isCancelled())
             {
                 Socket socket = serverSocket.accept();
-                String nick = new JSONObject(
-                        new BufferedReader(new InputStreamReader(socket.getInputStream())).readLine())
-                        .getString("nick");
-                mainPanel.writeLineInTextArea(
-                        "Nowe polaczenie z ip: " + socket.getRemoteSocketAddress().toString().substring(1) + " nick: "
-                                + nick);
+                String nick = new JSONObject(new BufferedReader(new InputStreamReader(socket.getInputStream()))
+                        .readLine()).getString("nick");
+                mainPanel.writeLineInTextArea("Nowe polaczenie z ip: "
+                        + socket.getRemoteSocketAddress().toString().substring(1) + " nick: " + nick);
+
                 if (clientsNumber.get() < maxUserThreads)
                 {
                     UserServerThread userThread = new UserServerThread(socket);
-                    userThread.addPropertyChangeListener(new PropertyChangeListener()
-                    {
-                        @Override
-                        public void propertyChange(PropertyChangeEvent evt)
+                    userThread.addPropertyChangeListener(propertyChange -> {
+                        if (userThread.isDone())
                         {
-                            if (userThread.isDone())
-                            {
-                                mainPanel.setActivePlayersNumber(clientsNumber.decrementAndGet());
-                            }
+                            mainPanel.setActivePlayersNumber(clientsNumber.decrementAndGet());
                         }
                     });
-                    userThreadList.add(new UserServerThread(socket));
+                    userThreadList.add(userThread);
                     userThreadExecutor.execute(userThreadList.getLast());
                     mainPanel.setActivePlayersNumber(clientsNumber.incrementAndGet());
                 }
@@ -88,17 +80,6 @@ public class MainServerThread extends SwingWorker<Object, Object>
             mainPanel.writeLineInTextArea("Blad podczas pracy serwera.");
             changeBtnStatus();
         }
-        finally
-        {
-            try
-            {
-                serverSocket.close();
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
         return null;
     }
 
@@ -115,7 +96,7 @@ public class MainServerThread extends SwingWorker<Object, Object>
     {
         try
         {
-            userThreadList.forEach(userThread->{
+            userThreadList.forEach(userThread -> {
                 userThread.cancel(true);
             });
             serverSocket.close();

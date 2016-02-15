@@ -33,21 +33,10 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
     @Override
     protected Boolean doInBackground()
     {
-
-        while (!socket.isClosed())
+        out.println(new JSONObject().put("state","connected"));
+        while(isCancelled())
         {
-            JSONObject outObj = new JSONObject();
-            outObj.put("state", "connected");
-            out.println(outObj);
-            try
-            {
-                in.readLine();
-            }
-            catch (IOException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+
         }
         return true;
     }
@@ -57,7 +46,7 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
     {
         try
         {
-            out.println(new JSONObject().put("end", "end"));
+            out.println(new JSONObject().put("cmd", "end"));
             socket.close();
         }
         catch (IOException e)
