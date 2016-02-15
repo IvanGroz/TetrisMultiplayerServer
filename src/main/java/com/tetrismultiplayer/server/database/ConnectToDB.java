@@ -33,7 +33,6 @@ public class ConnectToDB extends SwingWorker<EntityManagerFactory, Object> {
                 emf.createEntityManager().createNativeQuery("select 1 from dual").getSingleResult();
                 return emf;
             } catch (JDBCConnectionException | PersistenceException e) {
-                e.printStackTrace();
                 mainPanel.writeLineInTextArea("Podczas proby polaczenia z baza danych wystapil blad.");
                 mainPanel.writeLineInTextArea("Ponowienie proby za: ");
                 for (Integer j = 5; j > 0; j--) {
