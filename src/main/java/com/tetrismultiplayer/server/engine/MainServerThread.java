@@ -59,6 +59,7 @@ public class MainServerThread extends SwingWorker<Object, Object>
                         if (userThread.isDone())
                         {
                             mainPanel.setActivePlayersNumber(clientsNumber.decrementAndGet());
+                            mainPanel.writeLineInTextArea("Użytkownik rozłączony.");
                         }
                     });
                     userThreadList.add(userThread);
