@@ -1,6 +1,7 @@
 package main.java.com.tetrismultiplayer.server.engine;
 
 import main.java.com.tetrismultiplayer.server.Main;
+import main.java.com.tetrismultiplayer.server.engine.game.RemoteUser;
 import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
 import org.json.JSONObject;
 
@@ -26,6 +27,7 @@ public class MainServerThread extends SwingWorker<Object, Object>
     private AtomicInteger clientsNumber;
     private Integer maxUserThreads;
     private LinkedList<UserServerThread> userThreadList;
+    private LinkedList<RemoteUser> usersList;
 
     public MainServerThread(Main main, Integer serverPort, Integer maxUserThreads)
     {
@@ -35,6 +37,7 @@ public class MainServerThread extends SwingWorker<Object, Object>
         this.clientsNumber = new AtomicInteger(0);
         this.userThreadExecutor = Executors.newFixedThreadPool(maxUserThreads);
         this.userThreadList = new LinkedList<>();
+        this.usersList = new LinkedList<>();
     }
 
     @Override
@@ -47,19 +50,25 @@ public class MainServerThread extends SwingWorker<Object, Object>
             while (!isCancelled())
             {
                 Socket socket = serverSocket.accept();
-                String nick = new JSONObject(new BufferedReader(new InputStreamReader(socket.getInputStream()))
-                        .readLine()).getString("nick");
+                JSONObject connectionMsg =
+                        new JSONObject(new BufferedReader(new InputStreamReader(socket.getInputStream())).readLine());
+
+                String nick = connectionMsg.getString("nick");
+                String identifier = connectionMsg.getString("identifier");
+
                 mainPanel.writeLineInTextArea("Nowe polaczenie z ip: "
                         + socket.getRemoteSocketAddress().toString().substring(1) + " nick: " + nick);
 
                 if (clientsNumber.get() < maxUserThreads)
                 {
-                    UserServerThread userThread = new UserServerThread(socket);
+                    RemoteUser newUser = new RemoteUser(nick, identifier, socket);
+                    usersList.add(newUser);
+                    UserServerThread userThread = new UserServerThread(newUser);
                     userThread.addPropertyChangeListener(propertyChange -> {
                         if (userThread.isDone())
                         {
                             mainPanel.setActivePlayersNumber(clientsNumber.decrementAndGet());
-                            mainPanel.writeLineInTextArea("Użytkownik rozłączony.");
+                            mainPanel.writeLineInTextArea("Użytkownik " + newUser.getNick() + " rozłączony.");
                         }
                     });
                     userThreadList.add(userThread);
