@@ -1,0 +1,13 @@
+package main.java.com.tetrismultiplayer.server.database.dao;
+
+import main.java.com.tetrismultiplayer.server.database.dto.GameDTO;
+
+import javax.persistence.EntityManagerFactory;
+
+public class GameDAO extends DAOParentClass<GameDTO>
+{
+    protected GameDAO(EntityManagerFactory entityManagerFactory)
+    {
+	super(GameDTO.class, "game", entityManagerFactory);
+    }
+}
