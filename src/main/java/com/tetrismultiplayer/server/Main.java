@@ -6,9 +6,9 @@ import main.java.com.tetrismultiplayer.server.gui.frame.MainFrame;
 import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
 
 import javax.persistence.EntityManagerFactory;
-import java.util.concurrent.ExecutionException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.concurrent.ExecutionException;
 
 
 public class Main implements Runnable {

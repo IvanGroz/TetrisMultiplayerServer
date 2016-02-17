@@ -39,13 +39,9 @@ public class RemoteUser
         }
     }
 
-    public void sendToUser(String msg)
-    {
-        out.println(msg);
-    }
-
     public void sendToUser(JSONObject json)
     {
+        System.out.println("wyslano: "+json);
         out.println(json);
     }
 
@@ -53,7 +49,9 @@ public class RemoteUser
     {
         try
         {
-            return new JSONObject(in.readLine());
+            JSONObject newObject = new JSONObject(in.readLine());
+            System.out.println("odebrano: "+newObject);
+            return newObject;
         }
         catch (IOException e)
         {
@@ -78,6 +76,11 @@ public class RemoteUser
     public String getNick()
     {
         return nick;
+    }
+
+    public String getIdentifier()
+    {
+        return identifier;
     }
 
     public LinkedList<Tetromino> getTetrmonios()

@@ -18,4 +18,14 @@ public class UserMove
     {
         return move + user.getNick();
     }
+
+    public Move getMove()
+    {
+        return move;
+    }
+
+    public RemoteUser getUser()
+    {
+        return user;
+    }
 }

@@ -9,16 +9,14 @@ public class Brick
 {
     private Point position;
     private Dimension size;
-    private Color color;
 
-    public static final Integer LENGTH = 20;
+    public static final Integer LENGTH = 1;
 
-    public Brick(int positionX, int positionY, Color color)
+    public Brick(int positionX, int positionY)
     {
         super();
         this.position = new Point(positionX, positionY);
         this.size = new Dimension(LENGTH, LENGTH);
-        this.color = color;
     }
 
     public void moveBrick(int x, int y)

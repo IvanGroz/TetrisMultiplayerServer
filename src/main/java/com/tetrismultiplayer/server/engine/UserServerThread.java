@@ -46,24 +46,25 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
     private void forwardMove(JSONObject newMsg)
     {
         String key = newMsg.getString("key");
-        System.out.println(newMsg);
-        if (key.equals(Move.LEFT))
+        if (key.equals(Move.LEFT.toString()))
         {
+            System.out.println("lewo");
             game.registerMove(new UserMove(user, Move.LEFT));
         }
-        else if (key.equals(Move.RIGHT))
+        else if (key.equals(Move.RIGHT.toString()))
         {
+            System.out.println("prawo");
             game.registerMove(new UserMove(user, Move.RIGHT));
         }
-        else if (key.equals(Move.DOWN))
+        else if (key.equals(Move.DOWN.toString()))
         {
             game.registerMove(new UserMove(user, Move.DOWN));
         }
-        else if (key.equals(Move.DROP))
+        else if (key.equals(Move.DROP.toString()))
         {
             game.registerMove(new UserMove(user, Move.DROP));
         }
-        else if (key.equals(Move.ROTATE))
+        else if (key.equals(Move.ROTATE.toString()))
         {
             game.registerMove(new UserMove(user, Move.ROTATE));
         }

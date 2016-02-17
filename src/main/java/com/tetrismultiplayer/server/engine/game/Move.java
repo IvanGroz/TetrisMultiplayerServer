@@ -9,7 +9,7 @@ public enum Move
 
     public String toString()
     {
-        return this.toString().toLowerCase();
+        return name().toLowerCase();
     }
 }
 
