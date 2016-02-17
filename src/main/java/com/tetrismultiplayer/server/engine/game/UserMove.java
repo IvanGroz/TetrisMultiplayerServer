@@ -3,7 +3,19 @@ package main.java.com.tetrismultiplayer.server.engine.game;
 /**
  * Created by Marcin on 2016-02-16.
  */
-public enum UserMove
+public class UserMove
 {
-    DOWN, LEFT, RIGHT, DROP
+    Move move;
+    RemoteUser user;
+
+    public UserMove(RemoteUser user, Move move)
+    {
+        this.move = move;
+        this.user = user;
+    }
+
+    public String toString()
+    {
+        return move + user.getNick();
+    }
 }

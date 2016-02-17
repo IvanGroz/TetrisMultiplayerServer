@@ -1,5 +1,6 @@
 package main.java.com.tetrismultiplayer.server.engine.game;
 
+import main.java.com.tetrismultiplayer.server.engine.terominos.Tetromino;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.LinkedList;
 
 /**
  * Created by Marcin on 2016-02-16.
@@ -18,11 +20,13 @@ public class RemoteUser
     private PrintWriter out;
     private BufferedReader in;
     private Socket socket;
+    private LinkedList<Tetromino> tetrominos;
 
     public RemoteUser(String nick, String identifier, Socket socket)
     {
         this.nick = nick;
         this.identifier = identifier;
+        this.tetrominos = new LinkedList<>();
         try
         {
             this.socket = socket;
@@ -74,5 +78,10 @@ public class RemoteUser
     public String getNick()
     {
         return nick;
+    }
+
+    public LinkedList<Tetromino> getTetrmonios()
+    {
+        return tetrominos;
     }
 }

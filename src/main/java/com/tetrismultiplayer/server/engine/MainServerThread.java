@@ -63,7 +63,7 @@ public class MainServerThread extends SwingWorker<Object, Object>
                 {
                     RemoteUser newUser = new RemoteUser(nick, identifier, socket);
                     usersList.add(newUser);
-                    UserServerThread userThread = new UserServerThread(newUser);
+                    UserServerThread userThread = new UserServerThread(newUser, mainPanel);
                     userThread.addPropertyChangeListener(propertyChange -> {
                         if (userThread.isDone())
                         {

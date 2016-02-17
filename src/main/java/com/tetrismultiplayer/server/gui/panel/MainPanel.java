@@ -279,7 +279,10 @@ public class MainPanel extends JPanel
      */
     public void setActiveGamesNumber(Integer activeGamesNumber)
     {
-        activeGamesTextField.setText(activeGamesNumber.toString());
+        synchronized (activeGamesTextField)
+        {
+            activeGamesTextField.setText(activeGamesNumber.toString());
+        }
     }
 
     /**
