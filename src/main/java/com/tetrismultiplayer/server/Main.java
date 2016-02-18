@@ -31,7 +31,7 @@ public class Main implements Runnable {
         mainFrame.setVisible(true);
         mainPanel.setStartBtnStatus(true);
         mainPanel.setRankingBtnStatus(true);
-        //connectToDB();
+        connectToDB();
     }
 
     private void connectToDB() {

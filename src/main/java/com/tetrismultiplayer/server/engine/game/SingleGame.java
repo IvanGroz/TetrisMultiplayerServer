@@ -1,7 +1,5 @@
 package main.java.com.tetrismultiplayer.server.engine.game;
 
-import main.java.com.tetrismultiplayer.server.engine.terominos.Brick;
-import main.java.com.tetrismultiplayer.server.engine.terominos.Tetromino;
 import main.java.com.tetrismultiplayer.server.engine.terominos.TetrominoFactory;
 import main.java.com.tetrismultiplayer.server.engine.user.RemoteUser;
 import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
@@ -12,7 +10,6 @@ import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
 public class SingleGame extends ParentGameEngine
 {
     private RemoteUser remoteUser;
-    private TetrominoFactory tetrominoFactory;
 
     public SingleGame(RemoteUser remoteUser, MainPanel mainPanel, GameSpeed gameSpeed)
     {
@@ -27,19 +24,24 @@ public class SingleGame extends ParentGameEngine
         mainPanel.writeLineInTextArea("Nowa gra pojedyncza rozpoczeta przez uzytkownika "
                 + usersList.getFirst().getNick());
         // thisUser.sendToUser(new JSONObject().put("cmd", "clearLine").put("identifier", thisUser.getIdentifier()).put("row", 2));
-        long frameTime = System.currentTimeMillis();
-        placeNewTetromino();
+        long startFrameTime = System.currentTimeMillis();
+        placeNewTetromino(remoteUser);
         while (true)
         {
             checkPlayersMove();
             checkForLineToClear();
-            if (checkForInactiveBlock())
+            if (checkForInactiveBlocks())
             {
-                if (!placeNewTetromino()) return null;
+                if (!placeNewTetromino(remoteUser)) return null;
+            }
+
+            if (System.currentTimeMillis() - startFrameTime >= getFrameInterval())
+            {
+                moveDownAllActiveBlocks();
+                startFrameTime = System.currentTimeMillis();
             }
         }
     }
-
 
 
     private void checkForLineToClear()
@@ -47,30 +49,5 @@ public class SingleGame extends ParentGameEngine
 
     }
 
-    private boolean checkForInactiveBlock()
-    {
-        return false;
-    }
 
-    private boolean placeNewTetromino()
-    {
-        Tetromino newTetromino = tetrominoFactory.getNewTetromino();
-
-        for (Brick newBrick : newTetromino.getBricksList())
-        {
-            for (Tetromino userTetromino : remoteUser.getTetrominos())
-            {
-                for (Brick brick : userTetromino.getBricksList())
-                {
-                    if (brick.getPosition().equals(newBrick.getPosition())) return false;
-                }
-            }
-        }
-
-        remoteUser.addTetromino(newTetromino);
-        allTetrominos.add(newTetromino);
-        remoteUser.sendToUser(newTetromino.toJSON()
-                .put("identifier", remoteUser.getIdentifier()).put("cmd", "newTetromino"));
-        return true;
-    }
 }

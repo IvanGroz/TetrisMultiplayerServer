@@ -28,13 +28,26 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
         JSONObject newMsg;
         while (!(newMsg = user.readJSON()).getString("cmd").equals("end"))
         {
+            ParentGameEngine.GameSpeed gameSpeed = ParentGameEngine.GameSpeed.NORMAL;
+            switch (newMsg.getString("difficultyLvl"))
+            {
+                case "easy":
+                    gameSpeed = ParentGameEngine.GameSpeed.SLOW;
+                    break;
+                case "normal":
+                    gameSpeed = ParentGameEngine.GameSpeed.NORMAL;
+                    break;
+                case "hard":
+                    gameSpeed = ParentGameEngine.GameSpeed.FAST;
+                    break;
+            }
             switch (newMsg.getString("cmd"))
             {
                 case "newGame":
                     if (newMsg.getString("gameType").equals("single"))
                     {
                         user.sendToUser(new JSONObject().put("cmd", "gameStarted").put("type", "single"));
-                        game = new SingleGame(user, mainPanel, ParentGameEngine.GameSpeed.NORMAL);
+                        game = new SingleGame(user, mainPanel, gameSpeed);
                         game.execute();
                     }
                     break;

@@ -2,6 +2,7 @@ package main.java.com.tetrismultiplayer.server.engine.game;
 
 import main.java.com.tetrismultiplayer.server.engine.terominos.Brick;
 import main.java.com.tetrismultiplayer.server.engine.terominos.Tetromino;
+import main.java.com.tetrismultiplayer.server.engine.terominos.TetrominoFactory;
 import main.java.com.tetrismultiplayer.server.engine.user.Move;
 import main.java.com.tetrismultiplayer.server.engine.user.RemoteUser;
 import main.java.com.tetrismultiplayer.server.engine.user.UserMove;
@@ -20,6 +21,7 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
 {
     protected MainPanel mainPanel;
     protected ConcurrentLinkedQueue<UserMove> moveQueue;
+    protected TetrominoFactory tetrominoFactory;
     protected LinkedList<RemoteUser> usersList;
     protected LinkedList<Tetromino> allTetrominos;
     private long frameInterval;
@@ -93,8 +95,23 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
             Tetromino tetrominoCopy = Tetromino.getTetrominoCopy(previousTetromino);
             if (newMove.getMove().toString().equals("drop"))
             {
-                System.out.println("drop the bass");
-                //thisUser.sendToUser(new JSONObject().put("cmd", "move").put("identifier", thisUser.getIdentifier()).put("key", newMove.getMove()).put("amount", 3));
+                Integer dropAmount = 0;
+                tetrominoCopy.moveDown();
+                while (!isCollision(tetrominoCopy, previousTetromino))
+                {
+                    previousTetromino.moveDown();
+                    tetrominoCopy.moveDown();
+                    dropAmount++;
+                }
+                if (dropAmount > 0)
+                {
+                    for (RemoteUser user : usersList)
+                    {
+                        user.sendToUser(new JSONObject().put("cmd", "move")
+                                .put("identifier", newMove.getUser().getIdentifier())
+                                .put("key", newMove.getMove()).put("amount", dropAmount));
+                    }
+                }
             }
             else
             {
@@ -109,14 +126,14 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
                     else if (newMove.getMove().equals(Move.RIGHT)) previousTetromino.moveRight();
                     else if (newMove.getMove().equals(Move.ROTATE)) previousTetromino.rotate();
 
-                    newMove.getUser().sendToUser(new JSONObject().put("cmd", "move")
-                            .put("identifier", newMove.getUser().getIdentifier()).put("key", newMove.getMove()));
+                    usersList.forEach(user -> user.sendToUser(new JSONObject().put("cmd", "move")
+                            .put("identifier", newMove.getUser().getIdentifier()).put("key", newMove.getMove())));
                 }
             }
         }
     }
 
-    protected boolean isCollision(Tetromino tetromino, Tetromino previousTetromino)
+    private boolean isCollision(Tetromino tetromino, Tetromino previousTetromino)
     {
         for (Brick brick : tetromino.getBricksList())
         {
@@ -155,5 +172,32 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
                         .put("identifier", user.getIdentifier()).put("key", Move.DOWN.toString()));
             }
         });
+    }
+
+    protected boolean placeNewTetromino(RemoteUser user)
+    {
+        Tetromino newTetromino = tetrominoFactory.getNewTetromino();
+
+        for (Brick newBrick : newTetromino.getBricksList())
+        {
+            for (Tetromino userTetromino : allTetrominos)
+            {
+                for (Brick brick : userTetromino.getBricksList())
+                {
+                    if (brick.getPosition().equals(newBrick.getPosition())) return false;
+                }
+            }
+        }
+
+        user.addTetromino(newTetromino);
+        allTetrominos.add(newTetromino);
+        usersList.forEach(u -> u.sendToUser(newTetromino.toJSON()
+                .put("identifier", user.getIdentifier()).put("cmd", "newTetromino")));
+        return true;
+    }
+
+    protected boolean checkForInactiveBlocks()
+    {
+        return false;
     }
 }
