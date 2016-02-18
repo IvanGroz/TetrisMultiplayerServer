@@ -28,6 +28,8 @@ public class MainServerThread extends SwingWorker<Object, Object>
     private Integer maxUserThreads;
     private LinkedList<UserServerThread> userThreadList;
     private LinkedList<RemoteUser> usersList;
+    public static LinkedList<String> usersIp;
+    private String ip;
 
     public MainServerThread(Main main, Integer serverPort, Integer maxUserThreads)
     {
@@ -38,6 +40,7 @@ public class MainServerThread extends SwingWorker<Object, Object>
         this.userThreadExecutor = Executors.newFixedThreadPool(maxUserThreads);
         this.userThreadList = new LinkedList<>();
         this.usersList = new LinkedList<>();
+	this.usersIp = new LinkedList<>();
     }
 
     @Override
@@ -55,9 +58,10 @@ public class MainServerThread extends SwingWorker<Object, Object>
 
                 String nick = connectionMsg.getString("nick");
                 String identifier = connectionMsg.getString("identifier");
-
+		String ip = socket.getRemoteSocketAddress().toString().substring(1);
+		usersIp.add(nick + ": " + ip);
                 mainPanel.writeLineInTextArea("Nowe polaczenie z ip: "
-                        + socket.getRemoteSocketAddress().toString().substring(1) + " nick: " + nick);
+                        + ip + " nick: " + nick);
 
                 if (clientsNumber.get() < maxUserThreads)
                 {
