@@ -2,6 +2,7 @@ package main.java.com.tetrismultiplayer.server.gui.panel;
 
 import main.java.com.tetrismultiplayer.server.gui.actionlistener.*;
 import main.java.com.tetrismultiplayer.server.Main;
+
 import javax.persistence.EntityManagerFactory;
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -13,7 +14,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * Server application main gui panel class.
  *
  * @author Marcin
- *
  */
 public class MainPanel extends JPanel
 {
@@ -138,7 +138,7 @@ public class MainPanel extends JPanel
         btnStart.addActionListener(new StartActionListener(main));
         btnStop.addActionListener(new StopActionListener(main));
         btnRanking.addActionListener(new RankingActionListener());
-        btnConnections.addActionListener(new ConnectionsActionListener());
+        btnConnections.addActionListener(new ConnectionsActionListener(main));
     }
 
     /**
@@ -266,7 +266,7 @@ public class MainPanel extends JPanel
      */
     public void setActivePlayersNumber(Integer activePlayersNumber)
     {
-        synchronized(activePlayersTextField)
+        synchronized (activePlayersTextField)
         {
             activePlayersTextField.setText(activePlayersNumber.toString());
         }

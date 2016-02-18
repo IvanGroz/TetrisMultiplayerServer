@@ -1,5 +1,6 @@
 package main.java.com.tetrismultiplayer.server.gui.actionlistener;
 
+import main.java.com.tetrismultiplayer.server.Main;
 import main.java.com.tetrismultiplayer.server.gui.frame.ConnectionsFrame;
 
 import java.awt.*;
@@ -8,6 +9,13 @@ import java.awt.event.ActionListener;
 
 public class ConnectionsActionListener implements ActionListener
 {
+
+    private Main main;
+
+    public ConnectionsActionListener(Main main)
+    {
+        this.main = main;
+    }
 
     @Override
     public void actionPerformed(ActionEvent e)
@@ -18,7 +26,7 @@ public class ConnectionsActionListener implements ActionListener
             {
                 try
                 {
-                    ConnectionsFrame frame = new ConnectionsFrame();
+                    ConnectionsFrame frame = new ConnectionsFrame(main);
                     frame.setVisible(true);
                 }
                 catch (Exception e)

@@ -17,16 +17,21 @@ public class RemoteUser
 {
     private String nick;
     private String identifier;
+    private String ip;
+    private String status;
+
     private PrintWriter out;
     private BufferedReader in;
     private Socket socket;
     private LinkedList<Tetromino> tetrominos;
     private Tetromino activeTetromino;
 
-    public RemoteUser(String nick, String identifier, Socket socket)
+    public RemoteUser(String nick, String identifier, String ip, Socket socket, String status)
     {
         this.nick = nick;
         this.identifier = identifier;
+        this.ip = ip;
+        this.status = status;
         this.tetrominos = new LinkedList<>();
         try
         {
@@ -94,6 +99,11 @@ public class RemoteUser
         return identifier;
     }
 
+    public String getIp()
+    {
+        return ip;
+    }
+
     public LinkedList<Tetromino> getTetrominos()
     {
         return tetrominos;
@@ -103,5 +113,15 @@ public class RemoteUser
     {
         activeTetromino = newTetromino;
         tetrominos.add(newTetromino);
+    }
+
+    public String getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(String status)
+    {
+        this.status = status;
     }
 }

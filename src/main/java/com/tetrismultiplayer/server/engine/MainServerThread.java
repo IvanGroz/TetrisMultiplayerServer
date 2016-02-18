@@ -28,8 +28,6 @@ public class MainServerThread extends SwingWorker<Object, Object>
     private Integer maxUserThreads;
     private LinkedList<UserServerThread> userThreadList;
     private LinkedList<RemoteUser> usersList;
-    public static LinkedList<String> usersIp;
-    private String ip;
 
     public MainServerThread(Main main, Integer serverPort, Integer maxUserThreads)
     {
@@ -40,7 +38,6 @@ public class MainServerThread extends SwingWorker<Object, Object>
         this.userThreadExecutor = Executors.newFixedThreadPool(maxUserThreads);
         this.userThreadList = new LinkedList<>();
         this.usersList = new LinkedList<>();
-	this.usersIp = new LinkedList<>();
     }
 
     @Override
@@ -53,39 +50,23 @@ public class MainServerThread extends SwingWorker<Object, Object>
             while (!isCancelled())
             {
                 Socket socket = serverSocket.accept();
+
                 JSONObject connectionMsg =
                         new JSONObject(new BufferedReader(new InputStreamReader(socket.getInputStream())).readLine());
-
                 String nick = connectionMsg.getString("nick");
                 String identifier = connectionMsg.getString("identifier");
-		String ip = socket.getRemoteSocketAddress().toString().substring(1);
-		usersIp.add(nick + ": " + ip);
+                String ip = socket.getRemoteSocketAddress().toString().substring(1);
+
                 mainPanel.writeLineInTextArea("Nowe polaczenie z ip: "
                         + ip + " nick: " + nick);
 
                 if (clientsNumber.get() < maxUserThreads)
                 {
-                    RemoteUser newUser = new RemoteUser(nick, identifier, socket);
-                    usersList.add(newUser);
-                    UserServerThread userThread = new UserServerThread(newUser, mainPanel);
-                    userThread.addPropertyChangeListener(propertyChange -> {
-                        if (userThread.isDone())
-                        {
-                            mainPanel.setActivePlayersNumber(clientsNumber.decrementAndGet());
-                            mainPanel.writeLineInTextArea("Użytkownik " + newUser.getNick() + " rozłączony.");
-                        }
-                    });
-                    userThreadList.add(userThread);
-                    userThreadExecutor.execute(userThreadList.getLast());
-                    mainPanel.setActivePlayersNumber(clientsNumber.incrementAndGet());
+                    acceptNewConnection(nick, identifier, ip, socket);
                 }
                 else
                 {
-                    JSONObject rejectedObj = new JSONObject();
-                    rejectedObj.put("state", "rejected");
-                    new PrintWriter(socket.getOutputStream(), true).println(rejectedObj.toString());
-                    mainPanel.writeLineInTextArea(
-                            "Polaczenie odrzucone, przekroczona maksymalna ilosc klientow: " + maxUserThreads);
+                    rejectNewConnection(socket);
                 }
             }
         }
@@ -95,6 +76,32 @@ public class MainServerThread extends SwingWorker<Object, Object>
             changeBtnStatus();
         }
         return null;
+    }
+
+    private void acceptNewConnection(String nick, String identifier, String ip, Socket socket)
+    {
+        RemoteUser newUser = new RemoteUser(nick, identifier, ip, socket, "Połączony");
+        usersList.add(newUser);
+        UserServerThread userThread = new UserServerThread(newUser, mainPanel);
+        userThread.addPropertyChangeListener(propertyChange -> {
+            if (userThread.isDone())
+            {
+                mainPanel.setActivePlayersNumber(clientsNumber.decrementAndGet());
+                mainPanel.writeLineInTextArea("Użytkownik " + newUser.getNick() + " rozłączony.");
+            }
+        });
+        userThreadList.add(userThread);
+        userThreadExecutor.execute(userThreadList.getLast());
+        mainPanel.setActivePlayersNumber(clientsNumber.incrementAndGet());
+    }
+
+    private void rejectNewConnection(Socket socket) throws IOException
+    {
+        JSONObject rejectedObj = new JSONObject();
+        rejectedObj.put("state", "rejected");
+        new PrintWriter(socket.getOutputStream(), true).println(rejectedObj.toString());
+        mainPanel.writeLineInTextArea(
+                "Polaczenie odrzucone, przekroczona maksymalna ilosc klientow: " + maxUserThreads);
     }
 
     private void changeBtnStatus()
@@ -119,6 +126,11 @@ public class MainServerThread extends SwingWorker<Object, Object>
         {
             mainPanel.writeLineInTextArea("Blad podczas konczenia pracy serwera.");
         }
+    }
+
+    public LinkedList<RemoteUser> getUsersList()
+    {
+        return usersList;
     }
 }
 
