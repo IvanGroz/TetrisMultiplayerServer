@@ -65,7 +65,7 @@ public class RemoteUser
     {
         try
         {
-            out.println(new JSONObject().put("cmd", "end"));
+            sendToUser(new JSONObject().put("cmd", "end"));
             socket.close();
         }
         catch (IOException e)
@@ -77,6 +77,11 @@ public class RemoteUser
     public Tetromino getActiveTetromino()
     {
         return activeTetromino;
+    }
+
+    public void removeTetromino(Tetromino tetromino)
+    {
+        tetrominos.remove(tetromino);
     }
 
     public String getNick()

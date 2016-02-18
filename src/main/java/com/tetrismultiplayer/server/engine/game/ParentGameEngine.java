@@ -196,8 +196,26 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         return true;
     }
 
-    protected boolean checkForInactiveBlocks()
+    protected boolean checkForInactiveBlock(RemoteUser remoteUser)
     {
+        Tetromino activeTetromino = remoteUser.getActiveTetromino();
+        for (Brick activeTetrominoBrick : activeTetromino.getBricksList())
+        {
+            Point activeBrickPosition = activeTetrominoBrick.getPosition();
+            if (activeBrickPosition.y == getRowNumber() - 1) return true;
+            for (Tetromino tetromino : allTetrominos)
+            {
+                if (!activeTetromino.getPosition().equals(tetromino.getPosition()))
+                {
+                    for (Brick tetrominoBrick : tetromino.getBricksList())
+                    {
+                        Point brickPosition = tetrominoBrick.getPosition();
+                        if (activeBrickPosition.y == brickPosition.y - 1
+                                && activeBrickPosition.x == brickPosition.x) return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 }
