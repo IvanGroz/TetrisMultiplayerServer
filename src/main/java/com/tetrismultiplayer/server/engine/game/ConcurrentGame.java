@@ -7,9 +7,9 @@ import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
  */
 public class ConcurrentGame extends GameEngine
 {
-    public ConcurrentGame(MainPanel mainPanel)
+    public ConcurrentGame(MainPanel mainPanel, GameSpeed gameSpeed, int playersNumber)
     {
-        super(mainPanel);
+        super(mainPanel, gameSpeed, GameType.CONCURRENT, playersNumber);
     }
 
     public Object doInBackground()

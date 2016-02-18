@@ -21,6 +21,7 @@ public class RemoteUser
     private BufferedReader in;
     private Socket socket;
     private LinkedList<Tetromino> tetrominos;
+    private Tetromino activeTetromino;
 
     public RemoteUser(String nick, String identifier, Socket socket)
     {
@@ -41,7 +42,7 @@ public class RemoteUser
 
     public void sendToUser(JSONObject json)
     {
-        System.out.println("wyslano: "+json);
+        System.out.println("wyslano: " + json);
         out.println(json);
     }
 
@@ -50,7 +51,7 @@ public class RemoteUser
         try
         {
             JSONObject newObject = new JSONObject(in.readLine());
-            System.out.println("odebrano: "+newObject);
+            System.out.println("odebrano: " + newObject);
             return newObject;
         }
         catch (IOException e)
@@ -73,6 +74,11 @@ public class RemoteUser
         }
     }
 
+    public Tetromino getActiveTetromino()
+    {
+        return activeTetromino;
+    }
+
     public String getNick()
     {
         return nick;
@@ -83,8 +89,14 @@ public class RemoteUser
         return identifier;
     }
 
-    public LinkedList<Tetromino> getTetrmonios()
+    public LinkedList<Tetromino> getTetrominos()
     {
         return tetrominos;
+    }
+
+    public void addTetromino(Tetromino newTetromino)
+    {
+        activeTetromino = newTetromino;
+        tetrominos.add(newTetromino);
     }
 }

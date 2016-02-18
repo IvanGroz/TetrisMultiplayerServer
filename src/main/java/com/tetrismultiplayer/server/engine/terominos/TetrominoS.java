@@ -9,11 +9,15 @@ public class TetrominoS extends Tetromino
 {
     public TetrominoS(Color color, int x, int y)
     {
-        super(x, y, color);
-        type = TetrominoType.S;
-        bricksList.add(new Brick(x - (Brick.LENGTH / 2), y - Brick.LENGTH));
-        bricksList.add(new Brick(x + (Brick.LENGTH / 2), y - Brick.LENGTH));
-        bricksList.add(new Brick(x - (Brick.LENGTH / 2 + Brick.LENGTH), y));
-        bricksList.add(new Brick(x - (Brick.LENGTH / 2), y));
+        super(x, y, color, TetrominoType.S);
+        bricksList.add(new Brick(x - Brick.LENGTH, y - Brick.LENGTH));
+        bricksList.add(new Brick(x, y - Brick.LENGTH));
+        bricksList.add(new Brick(x - (Brick.LENGTH * 2), y));
+        bricksList.add(new Brick(x - Brick.LENGTH, y));
+    }
+
+    public TetrominoS(Tetromino tetromino)
+    {
+        super(tetromino);
     }
 }

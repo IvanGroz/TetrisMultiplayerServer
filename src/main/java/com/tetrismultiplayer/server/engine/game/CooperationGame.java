@@ -7,9 +7,9 @@ import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
  */
 public class CooperationGame extends GameEngine
 {
-    public CooperationGame(MainPanel mainPanel)
+    public CooperationGame(MainPanel mainPanel, GameSpeed gameSpeed, int playersNumber)
     {
-        super(mainPanel);
+        super(mainPanel, gameSpeed, GameType.COOPERATION, playersNumber);
     }
 
     public Object doInBackground()

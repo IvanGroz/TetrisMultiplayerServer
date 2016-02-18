@@ -31,7 +31,7 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
                     if (newMsg.getString("gameType").equals("single"))
                     {
                         user.sendToUser(new JSONObject().put("cmd", "gameStarted").put("type", "single"));
-                        game = new SingleGame(user, mainPanel);
+                        game = new SingleGame(user, mainPanel, GameEngine.GameSpeed.NORMAL);
                         game.execute();
                     }
                     break;
@@ -48,12 +48,10 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
         String key = newMsg.getString("key");
         if (key.equals(Move.LEFT.toString()))
         {
-            System.out.println("lewo");
             game.registerMove(new UserMove(user, Move.LEFT));
         }
         else if (key.equals(Move.RIGHT.toString()))
         {
-            System.out.println("prawo");
             game.registerMove(new UserMove(user, Move.RIGHT));
         }
         else if (key.equals(Move.DOWN.toString()))
