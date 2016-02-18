@@ -5,7 +5,7 @@ import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
 /**
  * Created by Marcin on 2016-02-16.
  */
-public class CooperationGame extends GameEngine
+public class CooperationGame extends ParentGameEngine
 {
     public CooperationGame(MainPanel mainPanel, GameSpeed gameSpeed, int playersNumber)
     {

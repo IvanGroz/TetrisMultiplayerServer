@@ -1,4 +1,4 @@
-package main.java.com.tetrismultiplayer.server.engine.game;
+package main.java.com.tetrismultiplayer.server.engine.user;
 
 import main.java.com.tetrismultiplayer.server.engine.terominos.Tetromino;
 import org.json.JSONObject;

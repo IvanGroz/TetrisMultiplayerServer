@@ -1,7 +1,7 @@
 package main.java.com.tetrismultiplayer.server.engine;
 
 import main.java.com.tetrismultiplayer.server.Main;
-import main.java.com.tetrismultiplayer.server.engine.game.RemoteUser;
+import main.java.com.tetrismultiplayer.server.engine.user.RemoteUser;
 import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
 import org.json.JSONObject;
 

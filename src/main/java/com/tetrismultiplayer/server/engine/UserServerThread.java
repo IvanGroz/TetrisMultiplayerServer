@@ -1,6 +1,9 @@
 package main.java.com.tetrismultiplayer.server.engine;
 
 import main.java.com.tetrismultiplayer.server.engine.game.*;
+import main.java.com.tetrismultiplayer.server.engine.user.Move;
+import main.java.com.tetrismultiplayer.server.engine.user.RemoteUser;
+import main.java.com.tetrismultiplayer.server.engine.user.UserMove;
 import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
 import org.json.JSONObject;
 
@@ -9,7 +12,7 @@ import javax.swing.*;
 public class UserServerThread extends SwingWorker<Boolean, Object>
 {
     private RemoteUser user;
-    private GameEngine game;
+    private ParentGameEngine game;
     private MainPanel mainPanel;
 
     public UserServerThread(RemoteUser user, MainPanel mainPanel)
@@ -31,7 +34,7 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
                     if (newMsg.getString("gameType").equals("single"))
                     {
                         user.sendToUser(new JSONObject().put("cmd", "gameStarted").put("type", "single"));
-                        game = new SingleGame(user, mainPanel, GameEngine.GameSpeed.NORMAL);
+                        game = new SingleGame(user, mainPanel, ParentGameEngine.GameSpeed.NORMAL);
                         game.execute();
                     }
                     break;

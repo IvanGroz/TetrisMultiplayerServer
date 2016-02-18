@@ -1,4 +1,4 @@
-package main.java.com.tetrismultiplayer.server.engine.game;
+package main.java.com.tetrismultiplayer.server.engine.user;
 
 /**
  * Created by Marcin on 2016-02-16.

@@ -29,7 +29,9 @@ public class Main implements Runnable {
     @Override
     public void run() {
         mainFrame.setVisible(true);
-        connectToDB();
+        mainPanel.setStartBtnStatus(true);
+        mainPanel.setRankingBtnStatus(true);
+        //connectToDB();
     }
 
     private void connectToDB() {

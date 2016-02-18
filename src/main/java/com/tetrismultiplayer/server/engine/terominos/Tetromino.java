@@ -21,18 +21,15 @@ public abstract class Tetromino
         this.position = new Point(positionX, positionY);
         this.color = color;
         this.type = type;
-        System.out.println("nowy " + type.toString());
     }
 
     protected Tetromino(Tetromino tetromino)
     {
-        System.out.println("w konstruktorze");
         this.bricksList = new LinkedList<>();
         tetromino.getBricksList().forEach(brick -> bricksList.add(new Brick(brick.getPosition().x, brick.getPosition().y)));
         this.position = new Point(tetromino.getPosition().x, tetromino.getPosition().y);
         this.color = tetromino.getColor();
         this.type = tetromino.getType();
-        System.out.println("nowy " + type.toString());
     }
 
     public enum TetrominoType
@@ -124,7 +121,6 @@ public abstract class Tetromino
     public static Tetromino getTetrominoCopy(Tetromino tetromino)
     {
         TetrominoType type = tetromino.getType();
-
         if (type.equals(TetrominoType.I)) return new TetrominoI(tetromino);
         else if (type.equals(TetrominoType.J)) return new TetrominoJ(tetromino);
         else if (type.equals(TetrominoType.L)) return new TetrominoL(tetromino);
