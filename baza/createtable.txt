@@ -1,0 +1,57 @@
+CREATE DATABASE IF NOT EXISTS tetrisDB;
+
+CREATE TABLE player
+(
+	name VARCHAR (256) NOT NULL
+);
+ALTER TABLE player ADD CONSTRAINT player_pk PRIMARY KEY (name);
+
+CREATE TABLE game
+(
+	id INT NOT NULL,
+	game_date DATE NOT NULL,
+	game_type VARCHAR (256) NOT NULL,
+	score_id INT NOT NULL
+);
+ALTER TABLE game ADD CONSTRAINT game_pk PRIMARY KEY (id);
+
+CREATE TABLE score
+(
+	id INT NOT NULL,
+	score INT NOT NULL,
+	game_id INT NOT NULL
+);
+ALTER TABLE score ADD CONSTRAINT score_pk PRIMARY KEY(id);
+
+CREATE TABLE score_player
+(
+	player_name VARCHAR (256) NOT NULL,
+	score_id INT NOT NULL
+);
+ALTER TABLE score_player ADD CONSTRAINT score_player_pk PRIMARY KEY (player_name, score_id);
+
+CREATE TABLE game_player
+(
+	player_name VARCHAR (256) NOT NULL,
+	game_id INT NOT NULL
+);
+ALTER TABLE game_player ADD CONSTRAINT game_player_pk PRIMARY KEY (player_name, game_id);
+
+
+ALTER TABLE score ADD CONSTRAINT score_game_FK FOREIGN KEY (game_id) REFERENCES game (id) ON
+DELETE CASCADE;
+
+ALTER TABLE game ADD CONSTRAINT game_score_FK FOREIGN KEY (score_id) REFERENCES score (id) ON
+DELETE CASCADE;
+
+ALTER TABLE score_player ADD CONSTRAINT score_player_player_FK FOREIGN KEY ( player_name ) REFERENCES player ( name ) ON
+DELETE CASCADE ;
+
+ALTER TABLE score_player ADD CONSTRAINT score_player_score_FK FOREIGN KEY ( score_id ) REFERENCES score ( id ) ON
+DELETE CASCADE ;
+
+ALTER TABLE game_player ADD CONSTRAINT game_player_player_FK FOREIGN KEY ( player_name ) REFERENCES player ( name ) ON
+DELETE CASCADE ;
+
+ALTER TABLE game_player ADD CONSTRAINT game_player_game_FK FOREIGN KEY ( game_id ) REFERENCES game ( id ) ON
+DELETE CASCADE ;
