@@ -3,6 +3,7 @@ package main.java.com.tetrismultiplayer.server.engine.game;
 import main.java.com.tetrismultiplayer.server.engine.terominos.Brick;
 import main.java.com.tetrismultiplayer.server.engine.terominos.Tetromino;
 import main.java.com.tetrismultiplayer.server.engine.terominos.TetrominoFactory;
+import main.java.com.tetrismultiplayer.server.engine.user.Move;
 import main.java.com.tetrismultiplayer.server.engine.user.RemoteUser;
 import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
 import org.json.JSONObject;
@@ -85,6 +86,16 @@ public class SingleGame extends ParentGameEngine
     {
         if (line != -1)
         {
+            LinkedList<Brick> allBricks = new LinkedList<>();
+            for (Tetromino tetromino : allTetrominos)
+            {
+                for (Brick brick : tetromino.getBricksList())
+                {
+                    allBricks.add(brick);
+                }
+            }
+            allBricks.sort((x, y) -> (Integer.valueOf(x.getPosition().y).compareTo(Integer.valueOf(y.getPosition().y))));
+
             for (int i = 0; i < allTetrominos.size(); i++)
             {
                 LinkedList<Brick> bricks = allTetrominos.get(i).getBricksList();
@@ -102,12 +113,56 @@ public class SingleGame extends ParentGameEngine
                     }
                 }
             }
-            System.out.println("linia do usuniecia "+line);
             remoteUser.getTetrominos().stream().filter(tetromino -> tetromino.getPosition().y <= line)
                     .forEach(tetromino1 -> tetromino1.moveDown());
-
             remoteUser.sendToUser(new JSONObject()
                     .put("cmd", "clearLine").put("identifier", remoteUser.getIdentifier()).put("row", line));
+            for (Tetromino tetromino : remoteUser.getTetrominos())
+            {
+                boolean isStabile = false;
+                for (Brick brick : tetromino.getBricksList())
+                {
+                    for (Tetromino tetromino2 : remoteUser.getTetrominos())
+                    {
+                        if (!tetromino2.equals(tetromino))
+                        {
+                            for (Brick brick2 : tetromino2.getBricksList())
+                            {
+                                if (brick.getPosition().x == brick2.getPosition().x
+                                        && brick.getPosition().y == brick2.getPosition().y - 1)
+                                {
+                                    isStabile = true;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (!isStabile)
+                {
+                    System.out.println("Bedzie upuszczane");
+                    Tetromino tetrominoCopy = Tetromino.getTetrominoCopy(tetromino);
+                    Integer dropAmount = 0;
+                    tetrominoCopy.moveDown();
+                    while (!isCollision(tetrominoCopy, tetromino))
+                    {
+                        tetromino.moveDown();
+                        tetrominoCopy.moveDown();
+                        dropAmount++;
+                    }
+                    if (dropAmount > 0)
+                    {
+                        tetromino.moveDown();
+                        for (RemoteUser user : usersList)
+                        {
+                            user.sendToUser(new JSONObject().put("cmd", "move")
+                                    .put("identifier", remoteUser.getIdentifier())
+                                    .put("key", Move.DROP.toString()).put("amount", dropAmount));
+                        }
+                    }
+                }
+            }
         }
     }
 }

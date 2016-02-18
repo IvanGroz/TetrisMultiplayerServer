@@ -133,7 +133,7 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         }
     }
 
-    private boolean isCollision(Tetromino tetromino, Tetromino previousTetromino)
+    protected boolean isCollision(Tetromino tetromino, Tetromino previousTetromino)
     {
         for (Brick brick : tetromino.getBricksList())
         {
