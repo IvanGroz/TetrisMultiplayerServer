@@ -10,12 +10,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.concurrent.ExecutionException;
 
-
 public class Main implements Runnable {
     private MainFrame mainFrame;
     private EntityManagerFactory entityManagerFactory;
     private MainPanel mainPanel;
     private MainServerThread mainServerThread;
+    public static Integer maxUsers = 10;
+    public static Integer maxGames = 5;
 
     private Main() {
         this.mainFrame = new MainFrame(this);

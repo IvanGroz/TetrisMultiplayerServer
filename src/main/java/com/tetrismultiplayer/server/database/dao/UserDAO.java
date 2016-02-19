@@ -7,9 +7,15 @@ import javax.persistence.EntityManagerFactory;
 public class UserDAO extends DAOParentClass<UserDTO>
 {
 
-    protected UserDAO(EntityManagerFactory entityManagerFactory)
+    public UserDAO(EntityManagerFactory entityManagerFactory)
     {
-        super(UserDTO.class, "user", entityManagerFactory);
+        super(UserDTO.class, "player", entityManagerFactory);
+    }
+
+    public UserDTO getUserByNickname(String nickname)
+    {
+	UserDTO user = getSingleEntity("name = '" + nickname + "'");
+	return user;
     }
 
 }
