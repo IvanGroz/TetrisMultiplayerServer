@@ -23,7 +23,7 @@ public class SingleGame extends ParentGameEngine
         while (true)
         {
             checkPlayersMove();
-            clearLine(checkForLineToClear(), -1);
+            clearLine(checkForLineToClear());
             if (checkForInactiveBlock(ownerUser))
             {
                 if (!placeNewTetromino(ownerUser))

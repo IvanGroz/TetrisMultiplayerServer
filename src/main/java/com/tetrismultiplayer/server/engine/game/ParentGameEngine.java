@@ -324,8 +324,9 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         return identifier;
     }
 
-    protected int checkForLineToClear()
+    protected LinkedList<Integer> checkForLineToClear()
     {
+        LinkedList<Integer> linesToDelete = new LinkedList<>();
         LinkedList<Brick> allBricks = new LinkedList<>();
         LinkedList<Tetromino> allTetrominosCopy = (LinkedList<Tetromino>) allTetrominos.clone();
         usersList.forEach(user -> allTetrominosCopy.remove(user.getActiveTetromino()));
@@ -346,107 +347,61 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
             if (allBricks.get(i).getPosition().y == allBricks.get(i + 1).getPosition().y)
             {
                 counter++;
-                if (counter == getColumnNumber()) return allBricks.get(i).getPosition().y;
+                if (counter == getColumnNumber())
+                {
+                    linesToDelete.add(allBricks.get(i).getPosition().y);
+                    counter = 1;
+                }
             }
             else
             {
                 counter = 1;
             }
         }
-        return -1;
+        return linesToDelete;
     }
 
-    protected void clearLine(int line, int position)
+    protected void clearLine(LinkedList<Integer> linesToClear)
     {
-        if (line != -1)
+        linesToClear.forEach(line ->
         {
-            if (position == -1)
-            {
-                usersList.forEach(user -> {
-                    LinkedList<Tetromino> tetrominos = user.getTetrominos();
-                    for (int i = 0; i < tetrominos.size(); i++)
+            usersList.forEach(user -> {
+                LinkedList<Tetromino> tetrominos = user.getTetrominos();
+                for (int i = 0; i < tetrominos.size(); i++)
+                {
+                    LinkedList<Brick> bricks = tetrominos.get(i).getBricksList();
+                    for (int j = 0; j < bricks.size(); j++)
                     {
-                        LinkedList<Brick> bricks = tetrominos.get(i).getBricksList();
-                        for (int j = 0; j < bricks.size(); j++)
+                        if (bricks.get(j).getPosition().y == line)
                         {
-                            if (bricks.get(j).getPosition().y == line)
+                            tetrominos.get(i).removeBrick(bricks.get(j));
+                            j--;
+                            if (tetrominos.get(i).getBricksList().isEmpty())
                             {
-                                tetrominos.get(i).removeBrick(bricks.get(j));
-                                j--;
-                                if (tetrominos.get(i).getBricksList().isEmpty())
-                                {
-                                    user.removeTetromino(tetrominos.get(i));
-                                    i--;
-                                }
+                                user.removeTetromino(tetrominos.get(i));
+                                i--;
                             }
                         }
                     }
-                });
+                }
+            });
 
-                usersList.forEach(user -> {
-                    user.getTetrominos().forEach(tetromino -> {
-                        LinkedList<Brick> bricks = tetromino.getBricksList();
-                        bricks.sort((brick1, brick2) -> Integer.valueOf(brick1.getPosition().y).compareTo(brick2.getPosition().y));
-                        if (bricks.getLast().getPosition().y < line)
-                        {
-                            tetromino.moveDown();
-                        }
-                    });
+            usersList.forEach(user -> {
+                user.getTetrominos().forEach(tetromino -> {
+                    LinkedList<Brick> bricks = tetromino.getBricksList();
+                    bricks.sort((brick1, brick2) -> Integer.valueOf(brick1.getPosition().y).compareTo(brick2.getPosition().y));
+                    if (bricks.getLast().getPosition().y < line)
+                    {
+                        tetromino.moveDown();
+                    }
                 });
-                usersList.forEach(user -> user.sendToUser(new JSONObject()
-                        .put("cmd", "clearLine").put("position", -1).put("row", line)));
-                //moveFloatingTetrominos();
-            }
-        }
-    }
-
-    private void moveFloatingTetrominos()
-    {
-        for (Tetromino tetromino : ownerUser.getTetrominos())
+            });
+            usersList.forEach(user -> user.sendToUser(new JSONObject()
+                    .put("cmd", "clearLine").put("position", -1).put("row", line)));
+        });
+        if (!linesToClear.isEmpty())
         {
-            boolean isStabile = false;
-            for (Brick brick : tetromino.getBricksList())
-            {
-                for (Tetromino tetromino2 : ownerUser.getTetrominos())
-                {
-                    if (!tetromino2.equals(tetromino))
-                    {
-                        for (Brick brick2 : tetromino2.getBricksList())
-                        {
-                            if (brick.getPosition().x == brick2.getPosition().x
-                                    && brick.getPosition().y == brick2.getPosition().y - 1)
-                            {
-                                isStabile = true;
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-            if (!isStabile)
-            {
-                System.out.println("Bedzie upuszczane");
-                Tetromino tetrominoCopy = Tetromino.getTetrominoCopy(tetromino);
-                Integer dropAmount = 0;
-                tetrominoCopy.moveDown();
-                while (!isCollision(tetrominoCopy, tetromino, false))
-                {
-                    tetromino.moveDown();
-                    tetrominoCopy.moveDown();
-                    dropAmount++;
-                }
-                if (dropAmount > 0)
-                {
-                    tetromino.moveDown();
-                    for (RemoteUser user : usersList)
-                    {
-                        user.sendToUser(new JSONObject().put("cmd", "move")
-                                .put("identifier", ownerUser.getIdentifier())
-                                .put("key", Move.DROP.toString()).put("amount", dropAmount));
-                    }
-                }
-            }
+            System.out.println("usunieto " + linesToClear.size() + " linii");
         }
     }
 }
