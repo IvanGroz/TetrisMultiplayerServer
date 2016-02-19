@@ -56,21 +56,28 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
     private void sendWaitingGames()
     {
         JSONObject gamesWaiting = new JSONObject().put("cmd", "setGamesList");
-        JSONArray gamesList = new JSONArray();
-        main.getMainServerThread().getGamesList().stream().filter(g -> g.getGameStatus().toString()
-                .equals(ParentGameEngine.GameStatus.WAITING.toString())).forEach(game -> {
-            JSONObject thisGame = new JSONObject()
-                    .put("owner", game.getOwnerUser().getIdentifier()).put("type", game.getGameType());
-            System.out.println("gra " + thisGame);
-            JSONArray users = new JSONArray();
-            game.getUsersList().forEach(user -> {
-                users.put(new JSONObject().put("nick", user.getNick()).put("identifier", user.getIdentifier())
-                        .put("ip", user.getIp()).put("ranking", user.getRanking()));
+        if (main.getMainServerThread().getGamesList().isEmpty())
+        {
+            gamesWaiting.put("isEmpty", "true");
+        }
+        else
+        {
+            gamesWaiting.put("isEmpty", "false");
+            JSONArray gamesList = new JSONArray();
+            main.getMainServerThread().getGamesList().stream().filter(g -> g.getGameStatus().toString()
+                    .equals(ParentGameEngine.GameStatus.WAITING.toString())).forEach(game -> {
+                JSONObject thisGame = new JSONObject()
+                        .put("owner", game.getOwnerUser().getIdentifier()).put("type", game.getGameType());
+                JSONArray users = new JSONArray();
+                game.getUsersList().forEach(user -> {
+                    users.put(new JSONObject().put("nick", user.getNick()).put("identifier", user.getIdentifier())
+                            .put("ip", user.getIp()).put("ranking", user.getRanking()));
+                });
+                thisGame.put("users", users);
+                gamesList.put(thisGame);
             });
-            thisGame.put("users", users);
-            gamesList.put(thisGame);
-        });
-        gamesWaiting.put("gamesList", gamesList);
+            gamesWaiting.put("gamesList", gamesList);
+        }
         user.sendToUser(gamesWaiting);
     }
 
@@ -109,8 +116,10 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
                 game = new CooperationGame(user, mainPanel, gameSpeed, newMsg.getInt("pNumber"));
                 break;
         }
-        main.getMainServerThread().getGamesList().add(game);
-        game.addPropertyChangeListener(propertyChange -> main.getMainServerThread().getGamesList().remove(game));
+        main.getMainServerThread().addNewGame(game);
+        game.addPropertyChangeListener(propertyChange -> {
+            if (game.isDone()) main.getMainServerThread().getGamesList().remove(game);
+        });
         game.execute();
     }
 

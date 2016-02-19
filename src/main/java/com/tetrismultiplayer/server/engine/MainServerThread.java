@@ -142,5 +142,11 @@ public class MainServerThread extends SwingWorker<Object, Object>
     {
         return gamesList;
     }
+
+    public void addNewGame(ParentGameEngine game)
+    {
+        System.out.println("dodano nowa gre "+ game.getOwnerUser());
+        gamesList.add(game);
+    }
 }
 
