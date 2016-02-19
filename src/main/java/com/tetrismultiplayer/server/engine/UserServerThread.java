@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.swing.*;
+import java.util.Map;
 
 public class UserServerThread extends SwingWorker<Boolean, Object>
 {
@@ -48,9 +49,20 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
                     break;
                 case "getWaitingGames":
                     sendWaitingGames();
+                    break;
+                case "connectToGame":
+                    connectToGame(newMsg);
+                    break;
             }
         }
         return true;
+    }
+
+    private void connectToGame(JSONObject newMsg)
+    {
+        ParentGameEngine newGame = main.getMainServerThread().getGamesList().get(newMsg.getString("identifier"));
+        this.game = newGame;
+        newGame.addUser(user);
     }
 
     private void sendWaitingGames()
@@ -64,10 +76,12 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
         {
             gamesWaiting.put("isEmpty", "false");
             JSONArray gamesList = new JSONArray();
-            main.getMainServerThread().getGamesList().stream().filter(g -> g.getGameStatus().toString()
-                    .equals(ParentGameEngine.GameStatus.WAITING.toString())).forEach(game -> {
-                JSONObject thisGame = new JSONObject()
-                        .put("owner", game.getOwnerUser().getIdentifier()).put("type", game.getGameType());
+            main.getMainServerThread().getGamesList().entrySet().stream().map(Map.Entry::getValue)
+                    .filter(g -> g.getGameStatus().toString()
+                            .equals(ParentGameEngine.GameStatus.WAITING.toString())).forEach(game -> {
+                JSONObject thisGame = new JSONObject().put("owner", game.getOwnerUser().getIdentifier())
+                        .put("type", game.getGameType().toString())
+                        .put("playersNumber", game.getPlayersNumber());
                 JSONArray users = new JSONArray();
                 game.getUsersList().forEach(user -> {
                     users.put(new JSONObject().put("nick", user.getNick()).put("identifier", user.getIdentifier())
@@ -108,11 +122,9 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
                 game = new SingleGame(user, mainPanel, gameSpeed);
                 break;
             case "concurrent":
-                user.sendToUser(new JSONObject().put("cmd", "gameStarted").put("type", "concurrent"));
                 game = new ConcurrentGame(user, mainPanel, gameSpeed, newMsg.getInt("pNumber"));
                 break;
             case "cooperation":
-                user.sendToUser(new JSONObject().put("cmd", "gameStarted").put("type", "cooperation"));
                 game = new CooperationGame(user, mainPanel, gameSpeed, newMsg.getInt("pNumber"));
                 break;
         }

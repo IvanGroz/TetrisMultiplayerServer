@@ -31,6 +31,7 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
     private GameStatus gameStatus;
     protected int playersNumber;
     protected RemoteUser ownerUser;
+    protected String identifier;
 
     public ParentGameEngine(GameStatus gameStatus, RemoteUser ownerUser, MainPanel mainPanel, GameSpeed gameSpeed, GameType gameType, int playersNumber)
     {
@@ -41,17 +42,12 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         this.usersList = new LinkedList<>();
         this.frameInterval = getFrameInterval(gameSpeed);
         this.gameType = gameType;
-        this.columnNumber = getColumnNumber(gameType);
+        this.columnNumber = 10 * playersNumber;
         this.rowNumber = 20;
         this.playersNumber = playersNumber;
         this.ownerUser = ownerUser;
+        this.identifier = ownerUser.getIdentifier();
         addUser(ownerUser);
-    }
-
-    private int getColumnNumber(GameType gameType)
-    {
-        if (gameType == GameType.CONCURRENT || gameType == GameType.COOPERATION) return 10 * playersNumber;
-        else return 10;
     }
 
     private long getFrameInterval(GameSpeed gameSpeed)
@@ -63,7 +59,7 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
 
     public enum GameStatus
     {
-        WAITING, RUNNING, ENDED
+        WAITING, RUNNING
     }
 
     public enum GameType
@@ -150,6 +146,7 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
             Point brickPosition = brick.getPosition();
             if (brickPosition.x < 0 || brickPosition.x >= getColumnNumber() || brickPosition.y >= getRowNumber())
             {
+                System.out.println("tutaj");
                 return true;
             }
             for (Tetromino existingTetromino : allTetrominos)
@@ -160,6 +157,7 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
                     {
                         if (brickPosition.equals(existingBrick.getPosition()))
                         {
+                            System.out.println("tutaj2");
                             return true;
                         }
                     }
@@ -178,8 +176,8 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
             if (!isCollision(movedTetromino, activeTetromino))
             {
                 activeTetromino.moveDown();
-                user.sendToUser(new JSONObject().put("cmd", "move")
-                        .put("identifier", user.getIdentifier()).put("key", Move.DOWN.toString()));
+                usersList.forEach(user2 -> user2.sendToUser(new JSONObject().put("cmd", "move")
+                        .put("identifier", user.getIdentifier()).put("key", Move.DOWN.toString())));
             }
         });
     }
@@ -271,12 +269,12 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
             JSONArray players = new JSONArray();
 
             usersList.forEach(user -> players.put(new JSONObject().put("nick", user.getNick())
-                    .put("identifier", user.getIdentifier()).put("ip", user.getIp())));
+                    .put("identifier", user.getIdentifier()).put("ip", user.getIp()).put("ranking", user.getRanking())));
 
             helloMsg.put("cmd", "gameStarted").put("type", gameType.toString().toLowerCase())
                     .put("playersNumber", playersNumber).put("players", players);
-
             usersList.forEach(user -> user.sendToUser(helloMsg));
+            setGameStatus(GameStatus.RUNNING);
             return true;
         }
         else
@@ -314,5 +312,15 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
     public GameType getGameType()
     {
         return gameType;
+    }
+
+    public int getPlayersNumber()
+    {
+        return playersNumber;
+    }
+
+    public String getIdentifier()
+    {
+        return identifier;
     }
 }

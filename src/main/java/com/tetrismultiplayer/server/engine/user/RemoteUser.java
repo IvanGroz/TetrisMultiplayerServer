@@ -51,7 +51,7 @@ public class RemoteUser
 
     public void sendToUser(JSONObject json)
     {
-        System.out.println("wyslano: " + json);
+        System.out.println("wyslano: " + getIdentifier() + " " + json);
         out.println(json);
     }
 
@@ -60,7 +60,7 @@ public class RemoteUser
         try
         {
             JSONObject newObject = new JSONObject(in.readLine());
-            System.out.println("odebrano: " + newObject);
+            System.out.println("odebrano: " + getIdentifier() + " " + newObject);
             return newObject;
         }
         catch (IOException e)

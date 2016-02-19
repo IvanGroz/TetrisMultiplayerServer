@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -30,7 +31,7 @@ public class MainServerThread extends SwingWorker<Object, Object>
     private Integer maxUserThreads;
     private LinkedList<UserServerThread> userThreadList;
     private LinkedList<RemoteUser> usersList;
-    private LinkedList<ParentGameEngine> gamesList;
+    private HashMap<String, ParentGameEngine> gamesList;
 
     public MainServerThread(Main main, Integer serverPort, Integer maxUserThreads)
     {
@@ -42,7 +43,7 @@ public class MainServerThread extends SwingWorker<Object, Object>
         this.userThreadExecutor = Executors.newFixedThreadPool(maxUserThreads);
         this.userThreadList = new LinkedList<>();
         this.usersList = new LinkedList<>();
-        this.gamesList = new LinkedList<>();
+        this.gamesList = new HashMap<>();
     }
 
     @Override
@@ -123,7 +124,7 @@ public class MainServerThread extends SwingWorker<Object, Object>
         try
         {
             userThreadList.forEach(userThread -> userThread.cancel(true));
-            gamesList.forEach(gameThread -> gameThread.cancel(true));
+            gamesList.entrySet().forEach(gameThread -> gameThread.getValue().cancel(true));
 
             serverSocket.close();
         }
@@ -138,15 +139,15 @@ public class MainServerThread extends SwingWorker<Object, Object>
         return usersList;
     }
 
-    public LinkedList<ParentGameEngine> getGamesList()
+    public HashMap<String, ParentGameEngine> getGamesList()
     {
         return gamesList;
     }
 
     public void addNewGame(ParentGameEngine game)
     {
-        System.out.println("dodano nowa gre "+ game.getOwnerUser());
-        gamesList.add(game);
+        System.out.println("dodano nowa gre " + game.getOwnerUser());
+        gamesList.put(game.getIdentifier(), game);
     }
 }
 
