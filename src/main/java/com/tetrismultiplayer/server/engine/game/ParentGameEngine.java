@@ -14,7 +14,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
 
 /**
  * Created by Marcin on 2016-02-16.
@@ -384,9 +383,16 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
                     }
                 });
 
-                usersList.stream().map(RemoteUser::getTetrominos).flatMap(t -> t.stream())
-                        .collect(Collectors.toList()).stream().filter(tetromino -> tetromino.getPosition().y <= line)
-                        .forEach(tetromino1 -> tetromino1.moveDown());
+                usersList.forEach(user -> {
+                    user.getTetrominos().forEach(tetromino -> {
+                        LinkedList<Brick> bricks = tetromino.getBricksList();
+                        bricks.sort((brick1, brick2) -> Integer.valueOf(brick1.getPosition().y).compareTo(brick2.getPosition().y));
+                        if (bricks.getLast().getPosition().y < line)
+                        {
+                            tetromino.moveDown();
+                        }
+                    });
+                });
                 usersList.forEach(user -> user.sendToUser(new JSONObject()
                         .put("cmd", "clearLine").put("position", -1).put("row", line)));
                 //moveFloatingTetrominos();

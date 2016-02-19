@@ -130,7 +130,11 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
         }
         main.getMainServerThread().addNewGame(game);
         game.addPropertyChangeListener(propertyChange -> {
-            if (game.isDone()) main.getMainServerThread().getGamesList().remove(game);
+            if (game.isDone())
+            {
+                game.getUsersList().forEach(user -> user.getTetrominos().clear());
+                main.getMainServerThread().getGamesList().remove(game);
+            }
         });
         game.execute();
     }
