@@ -7,6 +7,7 @@ import main.java.com.tetrismultiplayer.server.engine.user.Move;
 import main.java.com.tetrismultiplayer.server.engine.user.RemoteUser;
 import main.java.com.tetrismultiplayer.server.engine.user.UserMove;
 import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.swing.*;
@@ -21,17 +22,19 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
 {
     protected MainPanel mainPanel;
     protected ConcurrentLinkedQueue<UserMove> moveQueue;
-    protected TetrominoFactory tetrominoFactory;
     protected LinkedList<RemoteUser> usersList;
     protected LinkedList<Tetromino> allTetrominos;
     private long frameInterval;
     private int rowNumber;
     private int columnNumber;
     private GameType gameType;
+    private GameStatus gameStatus;
     protected int playersNumber;
+    protected RemoteUser ownerUser;
 
-    public ParentGameEngine(MainPanel mainPanel, GameSpeed gameSpeed, GameType gameType, int playersNumber)
+    public ParentGameEngine(GameStatus gameStatus, RemoteUser ownerUser, MainPanel mainPanel, GameSpeed gameSpeed, GameType gameType, int playersNumber)
     {
+        this.gameStatus = gameStatus;
         this.mainPanel = mainPanel;
         this.moveQueue = new ConcurrentLinkedQueue<>();
         this.allTetrominos = new LinkedList<>();
@@ -41,6 +44,8 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         this.columnNumber = getColumnNumber(gameType);
         this.rowNumber = 20;
         this.playersNumber = playersNumber;
+        this.ownerUser = ownerUser;
+        addUser(ownerUser);
     }
 
     private int getColumnNumber(GameType gameType)
@@ -54,6 +59,11 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         if (gameSpeed.equals(GameSpeed.SLOW)) return 1500;
         else if (gameSpeed.equals(GameSpeed.NORMAL)) return 1000;
         else return 500;
+    }
+
+    public enum GameStatus
+    {
+        WAITING, RUNNING, ENDED
     }
 
     public enum GameType
@@ -176,7 +186,7 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
 
     protected boolean placeNewTetromino(RemoteUser user)
     {
-        Tetromino newTetromino = tetrominoFactory.getNewTetromino();
+        Tetromino newTetromino = user.getNewTetromino();
 
         for (Brick newBrick : newTetromino.getBricksList())
         {
@@ -217,5 +227,92 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
             }
         }
         return false;
+    }
+
+    public void addUser(RemoteUser user)
+    {
+        if (usersList.size() < playersNumber)
+        {
+            usersList.add(user);
+            if (gameType.equals(GameType.SINGLE))
+            {
+                user.setTetrominoFactory(new TetrominoFactory());
+                user.setStatus("Gra pojedyncza");
+            }
+            else
+            {
+                if (gameType.equals(GameType.CONCURRENT)) user.setStatus("Gra wspólna");
+                else user.setStatus("Współzawodnictwo");
+
+                user.setTetrominoFactory(new TetrominoFactory(usersList.size()));
+            }
+        }
+    }
+
+    protected boolean waitForUsers()
+    {
+        int timeoutCounter = 59;
+        long startTime = System.currentTimeMillis();
+        while (usersList.size() < playersNumber && timeoutCounter > 0)
+        {
+            if (System.currentTimeMillis() - startTime >= 1000)
+            {
+                for (RemoteUser user : usersList)
+                {
+                    user.sendToUser(new JSONObject().put("cmd", "waiting").put("time", timeoutCounter));
+                }
+                startTime = System.currentTimeMillis();
+                timeoutCounter--;
+            }
+        }
+        if (usersList.size() == playersNumber)
+        {
+            JSONObject helloMsg = new JSONObject();
+            JSONArray players = new JSONArray();
+
+            usersList.forEach(user -> players.put(new JSONObject().put("nick", user.getNick())
+                    .put("identifier", user.getIdentifier()).put("ip", user.getIp())));
+
+            helloMsg.put("cmd", "gameStarted").put("type", gameType.toString().toLowerCase())
+                    .put("playersNumber", playersNumber).put("players", players);
+
+            usersList.forEach(user -> user.sendToUser(helloMsg));
+            return true;
+        }
+        else
+        {
+            usersList.forEach(user -> user.sendToUser(new JSONObject().put("cmd", "timeout")));
+            return false;
+        }
+    }
+
+    protected void done()
+    {
+        usersList.forEach(user -> user.sendToUser(new JSONObject().put("cmd", "endGame")));
+    }
+
+    public GameStatus getGameStatus()
+    {
+        return gameStatus;
+    }
+
+    public void setGameStatus(GameStatus gameStatus)
+    {
+        this.gameStatus = gameStatus;
+    }
+
+    public RemoteUser getOwnerUser()
+    {
+        return ownerUser;
+    }
+
+    public LinkedList<RemoteUser> getUsersList()
+    {
+        return usersList;
+    }
+
+    public GameType getGameType()
+    {
+        return gameType;
     }
 }

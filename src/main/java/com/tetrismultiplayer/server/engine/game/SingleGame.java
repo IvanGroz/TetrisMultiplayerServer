@@ -2,7 +2,6 @@ package main.java.com.tetrismultiplayer.server.engine.game;
 
 import main.java.com.tetrismultiplayer.server.engine.terominos.Brick;
 import main.java.com.tetrismultiplayer.server.engine.terominos.Tetromino;
-import main.java.com.tetrismultiplayer.server.engine.terominos.TetrominoFactory;
 import main.java.com.tetrismultiplayer.server.engine.user.Move;
 import main.java.com.tetrismultiplayer.server.engine.user.RemoteUser;
 import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
@@ -15,14 +14,9 @@ import java.util.LinkedList;
  */
 public class SingleGame extends ParentGameEngine
 {
-    private RemoteUser remoteUser;
-
-    public SingleGame(RemoteUser remoteUser, MainPanel mainPanel, GameSpeed gameSpeed)
+    public SingleGame(RemoteUser ownerUser, MainPanel mainPanel, GameSpeed gameSpeed)
     {
-        super(mainPanel, gameSpeed, GameType.SINGLE, 1);
-        this.remoteUser = remoteUser;
-        this.tetrominoFactory = new TetrominoFactory(1);
-        usersList.add(remoteUser);
+        super(GameStatus.RUNNING, ownerUser, mainPanel, gameSpeed, GameType.SINGLE, 1);
     }
 
     public Object doInBackground()
@@ -31,16 +25,15 @@ public class SingleGame extends ParentGameEngine
                 + usersList.getFirst().getNick());
 
         long startFrameTime = System.currentTimeMillis();
-        placeNewTetromino(remoteUser);
+        placeNewTetromino(ownerUser);
         while (true)
         {
             checkPlayersMove();
             clearLine(checkForLineToClear());
-            if (checkForInactiveBlock(remoteUser))
+            if (checkForInactiveBlock(ownerUser))
             {
-                if (!placeNewTetromino(remoteUser))
+                if (!placeNewTetromino(ownerUser))
                 {
-                    System.out.println("koniec gry");
                     return null;
                 }
             }
@@ -107,22 +100,22 @@ public class SingleGame extends ParentGameEngine
                         j--;
                         if (allTetrominos.get(i).getBricksList().isEmpty())
                         {
-                            remoteUser.removeTetromino(allTetrominos.get(i));
+                            ownerUser.removeTetromino(allTetrominos.get(i));
                             i--;
                         }
                     }
                 }
             }
-            remoteUser.getTetrominos().stream().filter(tetromino -> tetromino.getPosition().y <= line)
+            ownerUser.getTetrominos().stream().filter(tetromino -> tetromino.getPosition().y <= line)
                     .forEach(tetromino1 -> tetromino1.moveDown());
-            remoteUser.sendToUser(new JSONObject()
-                    .put("cmd", "clearLine").put("identifier", remoteUser.getIdentifier()).put("row", line));
-            for (Tetromino tetromino : remoteUser.getTetrominos())
+            ownerUser.sendToUser(new JSONObject()
+                    .put("cmd", "clearLine").put("identifier", ownerUser.getIdentifier()).put("row", line));
+            for (Tetromino tetromino : ownerUser.getTetrominos())
             {
                 boolean isStabile = false;
                 for (Brick brick : tetromino.getBricksList())
                 {
-                    for (Tetromino tetromino2 : remoteUser.getTetrominos())
+                    for (Tetromino tetromino2 : ownerUser.getTetrominos())
                     {
                         if (!tetromino2.equals(tetromino))
                         {
@@ -157,7 +150,7 @@ public class SingleGame extends ParentGameEngine
                         for (RemoteUser user : usersList)
                         {
                             user.sendToUser(new JSONObject().put("cmd", "move")
-                                    .put("identifier", remoteUser.getIdentifier())
+                                    .put("identifier", ownerUser.getIdentifier())
                                     .put("key", Move.DROP.toString()).put("amount", dropAmount));
                         }
                     }

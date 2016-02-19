@@ -1,6 +1,7 @@
 package main.java.com.tetrismultiplayer.server.engine;
 
 import main.java.com.tetrismultiplayer.server.Main;
+import main.java.com.tetrismultiplayer.server.engine.game.ParentGameEngine;
 import main.java.com.tetrismultiplayer.server.engine.user.RemoteUser;
 import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
 import org.json.JSONObject;
@@ -20,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainServerThread extends SwingWorker<Object, Object>
 {
+    private Main main;
     private MainPanel mainPanel;
     private ServerSocket serverSocket;
     private Integer serverPort;
@@ -28,9 +30,11 @@ public class MainServerThread extends SwingWorker<Object, Object>
     private Integer maxUserThreads;
     private LinkedList<UserServerThread> userThreadList;
     private LinkedList<RemoteUser> usersList;
+    private LinkedList<ParentGameEngine> gamesList;
 
     public MainServerThread(Main main, Integer serverPort, Integer maxUserThreads)
     {
+        this.main = main;
         this.mainPanel = main.getMainPanel();
         this.serverPort = serverPort;
         this.maxUserThreads = maxUserThreads;
@@ -38,6 +42,7 @@ public class MainServerThread extends SwingWorker<Object, Object>
         this.userThreadExecutor = Executors.newFixedThreadPool(maxUserThreads);
         this.userThreadList = new LinkedList<>();
         this.usersList = new LinkedList<>();
+        this.gamesList = new LinkedList<>();
     }
 
     @Override
@@ -82,7 +87,7 @@ public class MainServerThread extends SwingWorker<Object, Object>
     {
         RemoteUser newUser = new RemoteUser(nick, identifier, ip, socket, "Połączony");
         usersList.add(newUser);
-        UserServerThread userThread = new UserServerThread(newUser, mainPanel);
+        UserServerThread userThread = new UserServerThread(main, newUser, mainPanel);
         userThread.addPropertyChangeListener(propertyChange -> {
             if (userThread.isDone())
             {
@@ -117,9 +122,9 @@ public class MainServerThread extends SwingWorker<Object, Object>
     {
         try
         {
-            userThreadList.forEach(userThread -> {
-                userThread.cancel(true);
-            });
+            userThreadList.forEach(userThread -> userThread.cancel(true));
+            gamesList.forEach(gameThread -> gameThread.cancel(true));
+
             serverSocket.close();
         }
         catch (IOException e)
@@ -131,6 +136,11 @@ public class MainServerThread extends SwingWorker<Object, Object>
     public LinkedList<RemoteUser> getUsersList()
     {
         return usersList;
+    }
+
+    public LinkedList<ParentGameEngine> getGamesList()
+    {
+        return gamesList;
     }
 }
 

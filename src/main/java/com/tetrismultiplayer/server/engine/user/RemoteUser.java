@@ -1,6 +1,7 @@
 package main.java.com.tetrismultiplayer.server.engine.user;
 
 import main.java.com.tetrismultiplayer.server.engine.terominos.Tetromino;
+import main.java.com.tetrismultiplayer.server.engine.terominos.TetrominoFactory;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -25,6 +26,8 @@ public class RemoteUser
     private Socket socket;
     private LinkedList<Tetromino> tetrominos;
     private Tetromino activeTetromino;
+    private TetrominoFactory tetrominoFactory;
+    private Integer ranking;
 
     public RemoteUser(String nick, String identifier, String ip, Socket socket, String status)
     {
@@ -32,6 +35,7 @@ public class RemoteUser
         this.identifier = identifier;
         this.ip = ip;
         this.status = status;
+        this.ranking = 0;//TODO: dorobic wczytywanie rankingu
         this.tetrominos = new LinkedList<>();
         try
         {
@@ -120,8 +124,28 @@ public class RemoteUser
         return status;
     }
 
+    public void setTetrominoFactory(TetrominoFactory tetrominoFactory)
+    {
+        this.tetrominoFactory = tetrominoFactory;
+    }
+
+    public Tetromino getNewTetromino()
+    {
+        return tetrominoFactory.getNewTetromino();
+    }
+
     public void setStatus(String status)
     {
         this.status = status;
+    }
+
+    public Integer getRanking()
+    {
+        return ranking;
+    }
+
+    public void setRanking(Integer ranking)
+    {
+        this.ranking = ranking;
     }
 }

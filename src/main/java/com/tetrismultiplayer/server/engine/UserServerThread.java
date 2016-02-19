@@ -1,10 +1,15 @@
 package main.java.com.tetrismultiplayer.server.engine;
 
-import main.java.com.tetrismultiplayer.server.engine.game.*;
+import main.java.com.tetrismultiplayer.server.Main;
+import main.java.com.tetrismultiplayer.server.engine.game.ConcurrentGame;
+import main.java.com.tetrismultiplayer.server.engine.game.CooperationGame;
+import main.java.com.tetrismultiplayer.server.engine.game.ParentGameEngine;
+import main.java.com.tetrismultiplayer.server.engine.game.SingleGame;
 import main.java.com.tetrismultiplayer.server.engine.user.Move;
 import main.java.com.tetrismultiplayer.server.engine.user.RemoteUser;
 import main.java.com.tetrismultiplayer.server.engine.user.UserMove;
 import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.swing.*;
@@ -14,10 +19,12 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
     private RemoteUser user;
     private ParentGameEngine game;
     private MainPanel mainPanel;
+    private Main main;
 
-    public UserServerThread(RemoteUser user, MainPanel mainPanel)
+    public UserServerThread(Main main, RemoteUser user, MainPanel mainPanel)
     {
         this.mainPanel = mainPanel;
+        this.main = main;
         this.user = user;
     }
 
@@ -31,32 +38,80 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
             switch (newMsg.getString("cmd"))
             {
                 case "newGame":
-                    ParentGameEngine.GameSpeed gameSpeed = ParentGameEngine.GameSpeed.NORMAL;
-                    switch (newMsg.getString("difficultyLvl"))
-                    {
-                        case "easy":
-                            gameSpeed = ParentGameEngine.GameSpeed.SLOW;
-                            break;
-                        case "normal":
-                            gameSpeed = ParentGameEngine.GameSpeed.NORMAL;
-                            break;
-                        case "hard":
-                            gameSpeed = ParentGameEngine.GameSpeed.FAST;
-                            break;
-                    }
-                    if (newMsg.getString("gameType").equals("single"))
-                    {
-                        user.sendToUser(new JSONObject().put("cmd", "gameStarted").put("type", "single"));
-                        game = new SingleGame(user, mainPanel, gameSpeed);
-                        game.execute();
-                    }
+                    startNewGame(newMsg);
                     break;
                 case "move":
                     forwardMove(newMsg);
                     break;
+                case "getRanking":
+                    sendRanking();
+                    break;
+                case "getWaitingGames":
+                    sendWaitingGames();
             }
         }
         return true;
+    }
+
+    private void sendWaitingGames()
+    {
+        JSONObject gamesWaiting = new JSONObject().put("cmd", "setGamesList");
+        JSONArray gamesList = new JSONArray();
+        main.getMainServerThread().getGamesList().stream().filter(g -> g.getGameStatus().toString()
+                .equals(ParentGameEngine.GameStatus.WAITING.toString())).forEach(game -> {
+            JSONObject thisGame = new JSONObject()
+                    .put("owner", game.getOwnerUser().getIdentifier()).put("type", game.getGameType());
+            System.out.println("gra " + thisGame);
+            JSONArray users = new JSONArray();
+            game.getUsersList().forEach(user -> {
+                users.put(new JSONObject().put("nick", user.getNick()).put("identifier", user.getIdentifier())
+                        .put("ip", user.getIp()).put("ranking", user.getRanking()));
+            });
+            thisGame.put("users", users);
+            gamesList.put(thisGame);
+        });
+        gamesWaiting.put("gamesList", gamesList);
+        user.sendToUser(gamesWaiting);
+    }
+
+    private void sendRanking()
+    {
+
+    }
+
+    private void startNewGame(JSONObject newMsg)
+    {
+        ParentGameEngine.GameSpeed gameSpeed = ParentGameEngine.GameSpeed.NORMAL;
+        switch (newMsg.getString("difficultyLvl"))
+        {
+            case "easy":
+                gameSpeed = ParentGameEngine.GameSpeed.SLOW;
+                break;
+            case "normal":
+                gameSpeed = ParentGameEngine.GameSpeed.NORMAL;
+                break;
+            case "hard":
+                gameSpeed = ParentGameEngine.GameSpeed.FAST;
+                break;
+        }
+        switch (newMsg.getString("gameType"))
+        {
+            case "single":
+                user.sendToUser(new JSONObject().put("cmd", "gameStarted").put("type", "single"));
+                game = new SingleGame(user, mainPanel, gameSpeed);
+                break;
+            case "concurrent":
+                user.sendToUser(new JSONObject().put("cmd", "gameStarted").put("type", "concurrent"));
+                game = new ConcurrentGame(user, mainPanel, gameSpeed, newMsg.getInt("pNumber"));
+                break;
+            case "cooperation":
+                user.sendToUser(new JSONObject().put("cmd", "gameStarted").put("type", "cooperation"));
+                game = new CooperationGame(user, mainPanel, gameSpeed, newMsg.getInt("pNumber"));
+                break;
+        }
+        main.getMainServerThread().getGamesList().add(game);
+        game.addPropertyChangeListener(propertyChange -> main.getMainServerThread().getGamesList().remove(game));
+        game.execute();
     }
 
     private void forwardMove(JSONObject newMsg)

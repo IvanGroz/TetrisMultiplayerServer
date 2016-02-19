@@ -1,5 +1,6 @@
 package main.java.com.tetrismultiplayer.server.engine.game;
 
+import main.java.com.tetrismultiplayer.server.engine.user.RemoteUser;
 import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
 
 /**
@@ -7,13 +8,17 @@ import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
  */
 public class ConcurrentGame extends ParentGameEngine
 {
-    public ConcurrentGame(MainPanel mainPanel, GameSpeed gameSpeed, int playersNumber)
+    public ConcurrentGame(RemoteUser ownerUser, MainPanel mainPanel, GameSpeed gameSpeed, int playersNumber)
     {
-        super(mainPanel, gameSpeed, GameType.CONCURRENT, playersNumber);
+        super(GameStatus.WAITING, ownerUser, mainPanel, gameSpeed, GameType.CONCURRENT, playersNumber);
     }
 
     public Object doInBackground()
     {
+        if (waitForUsers())
+        {
+
+        }
         return null;
     }
 }

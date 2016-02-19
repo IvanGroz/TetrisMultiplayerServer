@@ -9,17 +9,20 @@ public class TetrominoFactory
 {
     private Color color;
     private Point position;
-
-    public TetrominoFactory(Color color, Integer position)
-    {
-        this.color = color;
-        setPosition(position);
-    }
+    private Boolean isRandomColor;
 
     public TetrominoFactory(Integer position)
     {
-        this.color = null;
+        this.isRandomColor = false;
+        color = getRandomColor();
         setPosition(position);
+    }
+
+    public TetrominoFactory()
+    {
+        this.color = null;
+        this.isRandomColor = true;
+        setPosition(1);
     }
 
     private void setPosition(int positionNumber)
@@ -44,35 +47,13 @@ public class TetrominoFactory
     public Tetromino getNewTetromino()
     {
         Color tetrominoColor = null;
-        if (color == null)
+        if (isRandomColor)
         {
-            switch ((int) Math.round(Math.random() * 7))
-            {
-                case 0:
-                    tetrominoColor = Color.PINK;
-                    break;
-                case 1:
-                    tetrominoColor = Color.CYAN;
-                    break;
-                case 2:
-                    tetrominoColor = Color.BLUE;
-                    break;
-                case 3:
-                    tetrominoColor = Color.GRAY;
-                    break;
-                case 4:
-                    tetrominoColor = Color.GREEN;
-                    break;
-                case 5:
-                    tetrominoColor = Color.ORANGE;
-                    break;
-                case 6:
-                    tetrominoColor = Color.YELLOW;
-                    break;
-                default:
-                    tetrominoColor = Color.RED;
-                    break;
-            }
+            tetrominoColor = getRandomColor();
+        }
+        else
+        {
+            tetrominoColor = color;
         }
 
         Tetromino newTetromino;
@@ -101,5 +82,28 @@ public class TetrominoFactory
                 break;
         }
         return newTetromino;
+    }
+
+    private Color getRandomColor()
+    {
+        switch ((int) Math.round(Math.random() * 7))
+        {
+            case 0:
+                return Color.PINK;
+            case 1:
+                return Color.CYAN;
+            case 2:
+                return Color.BLUE;
+            case 3:
+                return Color.GRAY;
+            case 4:
+                return Color.GREEN;
+            case 5:
+                return Color.ORANGE;
+            case 6:
+                return Color.YELLOW;
+            default:
+                return Color.RED;
+        }
     }
 }
