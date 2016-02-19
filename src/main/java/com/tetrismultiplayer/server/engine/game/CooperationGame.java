@@ -28,7 +28,7 @@ public class CooperationGame extends ParentGameEngine
             {
                 checkPlayersMove();
 
-                //clearLine(checkForLineToClear());
+                clearLine(checkForLineToClear(), -1);
                 for (RemoteUser user : usersList)
                 {
                     if (checkForInactiveBlock(user))
