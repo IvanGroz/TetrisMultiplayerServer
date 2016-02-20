@@ -10,4 +10,10 @@ public class GameDAO extends DAOParentClass<GameDTO>
     {
 	super(GameDTO.class, "game", entityManagerFactory);
     }
+
+    public GameDTO getGameByDate(Long date)
+    {
+	GameDTO game = getSingleEntity("game_date = '" + date + "'");
+	return game;
+    }
 }

@@ -2,7 +2,9 @@ package main.java.com.tetrismultiplayer.server.engine;
 
 import main.java.com.tetrismultiplayer.server.Main;
 import main.java.com.tetrismultiplayer.server.database.dao.GameDAO;
+import main.java.com.tetrismultiplayer.server.database.dao.ScoreDAO;
 import main.java.com.tetrismultiplayer.server.database.dto.GameDTO;
+import main.java.com.tetrismultiplayer.server.database.dto.ScoreDTO;
 import main.java.com.tetrismultiplayer.server.database.dto.UserDTO;
 import main.java.com.tetrismultiplayer.server.engine.game.ConcurrentGame;
 import main.java.com.tetrismultiplayer.server.engine.game.CooperationGame;
@@ -16,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.swing.*;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -160,7 +161,8 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
     private void addGameToDb(ParentGameEngine game)
     {
 	GameDTO newGameInDb = new GameDTO();
-	newGameInDb.setGameDate(Calendar.getInstance().getTime());
+	Long date = System.currentTimeMillis();
+	newGameInDb.setGameDate(date);
 	newGameInDb.setGameType(game.getGameType().name());
 	LinkedList<UserDTO> users = new LinkedList<UserDTO>();
 
@@ -170,9 +172,24 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
 	    user.setName(game.getUsersList().get(i).getNick());
 	    users.add(user);
 	}
-	newGameInDb.setPlayer(users);
-
+	LinkedList<ScoreDTO> scores = new LinkedList<ScoreDTO>();
+	for(int i = 0; i < game.getPlayersNumber(); i++)
+	{
+	    ScoreDTO score = new ScoreDTO();
+	    score.setScore(game.getUsersList().get(i).getScore());
+	    scores.add(score);
+	}
+	newGameInDb.setScore(scores);
 	new GameDAO(main.getEntityManagerFactory()).insert(newGameInDb);
+
+	for(int i = 0; i < game.getPlayersNumber(); i++)
+	{
+	    ScoreDTO score = new ScoreDTO();
+	    score.setScore(game.getUsersList().get(i).getScore());
+	    score.setGame(new GameDAO(main.getEntityManagerFactory()).getGameByDate(date));
+	    score.setPlayer(users);
+	    new ScoreDAO(main.getEntityManagerFactory()).insert(score);
+	}
     }
 
     private void forwardMove(JSONObject newMsg)

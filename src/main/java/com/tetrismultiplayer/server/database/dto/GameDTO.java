@@ -13,12 +13,9 @@ public class GameDTO
     @Column(name = "id")
     private Integer id;
     @Column(name = "game_date")
-    private Date gameDate;
+    private Long gameDate;
     @Column(name = "game_type")
     private String gameType;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "player_name")
-    private List<UserDTO> player;
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
     private List<ScoreDTO> score;
 
@@ -32,12 +29,12 @@ public class GameDTO
 	this.id = id;
     }
 
-    public Date getGameDate()
+    public Long getGameDate()
     {
 	return gameDate;
     }
 
-    public void setGameDate(Date gameDate)
+    public void setGameDate(Long gameDate)
     {
 	this.gameDate = gameDate;
     }
@@ -50,16 +47,6 @@ public class GameDTO
     public void setGameType(String gameType)
     {
 	this.gameType = gameType;
-    }
-
-    public List<UserDTO> getPlayer()
-    {
-	return player;
-    }
-
-    public void setPlayer(List<UserDTO> player)
-    {
-	this.player = player;
     }
 
     public List<ScoreDTO> getScore()

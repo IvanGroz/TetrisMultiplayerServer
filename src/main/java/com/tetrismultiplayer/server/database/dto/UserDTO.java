@@ -12,8 +12,6 @@ public class UserDTO implements Serializable
     @Column(name = "name")
     private String name;
     @ManyToMany(mappedBy = "player", fetch = FetchType.LAZY)
-    private List<GameDTO> game;
-    @ManyToMany(mappedBy = "player", fetch = FetchType.LAZY)
     private List<ScoreDTO> score;
 
     public String getName()
@@ -24,16 +22,6 @@ public class UserDTO implements Serializable
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    public List<GameDTO> getGames()
-    {
-        return game;
-    }
-
-    public void setGames(List<GameDTO> game)
-    {
-        this.game = game;
     }
 
     public List<ScoreDTO> getScores()

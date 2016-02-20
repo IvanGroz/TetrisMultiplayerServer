@@ -39,8 +39,7 @@ public class ConcurrentGame extends ParentGameEngine
                         if (!placeNewTetromino(user))
                         {
                             user.sendToUser(new JSONObject().put("cmd", "endGame"));
-                            usersList.remove(i);
-                            i--;
+			    i--;
                             if (i <= 0) return null;
                         }
                     }
