@@ -127,7 +127,7 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
                 else if (newMove.getMove() == (Move.RIGHT)) tetrominoCopy.moveRight();
                 else if (newMove.getMove() == (Move.ROTATE)) tetrominoCopy.rotate();
                 if (!isCollision(tetrominoCopy, previousTetromino, true)
-                        && (!isConcurrent || previousTetromino.getPosition().y > 3))
+                        && (!isConcurrent || previousTetromino.getPosition().y > 2))
                 {
                     if (newMove.getMove().equals(Move.DOWN)) previousTetromino.moveDown();
                     else if (newMove.getMove().equals(Move.LEFT)) previousTetromino.moveLeft();
