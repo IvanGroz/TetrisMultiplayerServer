@@ -6,6 +6,9 @@ import main.java.com.tetrismultiplayer.server.engine.MainServerThread;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Action listener to start server button.
+ */
 public class StartActionListener implements ActionListener
 {
     private Main main;

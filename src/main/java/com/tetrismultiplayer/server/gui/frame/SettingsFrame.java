@@ -4,6 +4,9 @@ import main.java.com.tetrismultiplayer.server.gui.panel.SettingsPanel;
 
 import javax.swing.*;
 
+/**
+ * Settings frame class.
+ */
 public class SettingsFrame extends JFrame
 {
     private static final long serialVersionUID = -5099033041385494292L;

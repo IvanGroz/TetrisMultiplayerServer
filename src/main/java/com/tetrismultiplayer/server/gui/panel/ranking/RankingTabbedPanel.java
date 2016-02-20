@@ -2,6 +2,9 @@ package main.java.com.tetrismultiplayer.server.gui.panel.ranking;
 
 import javax.swing.JTabbedPane;
 
+/**
+ * Class for ranking panel with tabs.
+ */
 public class RankingTabbedPanel extends JTabbedPane
 {
     private static final long serialVersionUID = 1327792069279300334L;
@@ -13,9 +16,9 @@ public class RankingTabbedPanel extends JTabbedPane
     {
 	super();
 
-	addTab("Gra pojedyñcza", new SinglePlayerRankingPanel());
+	addTab("Gra pojedyÅ„cza", new SinglePlayerRankingPanel());
 
-	addTab("Gra wspólna", new CooperationRankingPanel());
+	addTab("Gra wspÃ³lna", new CooperationRankingPanel());
 
 	addTab("Gra przeciwko", new CompetitionRankingPanel());
     }

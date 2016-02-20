@@ -6,6 +6,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Action listener for settings button.
+ */
 public class SettingsActionListener implements ActionListener
 {
 

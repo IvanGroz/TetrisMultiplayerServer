@@ -4,6 +4,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Class representing player in databse.
+ */
 @Entity
 @Table(name = "player")
 public class UserDTO implements Serializable

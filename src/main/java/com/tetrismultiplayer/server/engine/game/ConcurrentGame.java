@@ -5,7 +5,7 @@ import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
 import org.json.JSONObject;
 
 /**
- * Created by Marcin on 2016-02-16.
+ * Class and thread for concurrent game.
  */
 public class ConcurrentGame extends ParentGameEngine
 {
@@ -14,6 +14,11 @@ public class ConcurrentGame extends ParentGameEngine
         super(GameStatus.WAITING, ownerUser, mainPanel, gameSpeed, GameType.CONCURRENT, playersNumber);
     }
 
+    /**
+     * Main concurrent game thread for concurrent game. Maintains all users connected to game.
+     * @return null
+     * @throws InterruptedException
+     */
     public Object doInBackground() throws InterruptedException
     {
         mainPanel.writeLineInTextArea("Nowa gra w trybie konkurencji utworzona przez uzytkownika "

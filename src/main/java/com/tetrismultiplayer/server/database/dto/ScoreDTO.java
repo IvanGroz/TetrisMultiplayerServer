@@ -4,6 +4,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Class representing score in database.
+ */
 @Entity
 @Table(name = "score")
 public class ScoreDTO implements Serializable
@@ -23,40 +26,41 @@ public class ScoreDTO implements Serializable
 
     public Integer getId()
     {
-	return id;
+        return id;
     }
 
     public void setId(Integer id)
     {
-	this.id = id;
+        this.id = id;
     }
+
     public Integer getScore()
     {
-	return score;
+        return score;
     }
 
     public void setScore(Integer score)
     {
-	this.score = score;
+        this.score = score;
     }
 
     public GameDTO getGame()
     {
-	return game;
+        return game;
     }
 
     public void setGame(GameDTO game)
     {
-	this.game = game;
+        this.game = game;
     }
 
     public List<UserDTO> getPlayer()
     {
-	return player;
+        return player;
     }
 
     public void setPlayer(List<UserDTO> player)
     {
-	this.player = player;
+        this.player = player;
     }
 }

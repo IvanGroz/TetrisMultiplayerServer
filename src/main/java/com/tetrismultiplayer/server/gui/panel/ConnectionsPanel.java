@@ -9,6 +9,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Vector;
 
+/**
+ * Connections panel showing all users connected to server.
+ */
 public class ConnectionsPanel extends JPanel
 {
     private JTable connectionsTable;

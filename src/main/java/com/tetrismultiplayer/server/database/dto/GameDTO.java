@@ -4,6 +4,9 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Class representing game in database.
+ */
 @Entity
 @Table(name = "game")
 public class GameDTO

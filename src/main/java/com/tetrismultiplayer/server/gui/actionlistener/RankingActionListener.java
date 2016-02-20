@@ -6,6 +6,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Action listener for ranking button.
+ */
 public class RankingActionListener implements ActionListener
 {
 

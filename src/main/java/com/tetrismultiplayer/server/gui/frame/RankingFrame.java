@@ -4,6 +4,9 @@ import main.java.com.tetrismultiplayer.server.gui.panel.ranking.RankingTabbedPan
 
 import javax.swing.*;
 
+/**
+ * Ranking rame class.
+ */
 public class RankingFrame extends JFrame
 {
     private static final long serialVersionUID = -8209794248344578503L;

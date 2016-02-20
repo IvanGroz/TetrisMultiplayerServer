@@ -7,6 +7,9 @@ import javax.swing.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
+/**
+ * Main frame displaying game window.
+ */
 public class MainFrame extends JFrame
 {
     private static final long serialVersionUID = -6903076602874962620L;
@@ -21,6 +24,9 @@ public class MainFrame extends JFrame
         init();
     }
 
+    /**
+     * Method initializing main frame components
+     */
     private void init()
     {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

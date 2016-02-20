@@ -6,6 +6,9 @@ import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Action listener to stop server button.
+ */
 public class StopActionListener implements ActionListener
 {
     private Main main;

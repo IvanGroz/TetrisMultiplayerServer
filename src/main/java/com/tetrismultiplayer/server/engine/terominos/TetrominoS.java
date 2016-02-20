@@ -3,7 +3,7 @@ package main.java.com.tetrismultiplayer.server.engine.terominos;
 import java.awt.*;
 
 /**
- * Created by Marcin on 2016-02-16.
+ * Class for S shaped tetromino.
  */
 public class TetrominoS extends Tetromino
 {

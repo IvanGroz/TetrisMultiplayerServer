@@ -3,7 +3,7 @@ package main.java.com.tetrismultiplayer.server.engine.terominos;
 import java.awt.*;
 
 /**
- * Created by Marcin on 2016-02-18.
+ * Tetromino factory class creates new tetromino for users.
  */
 public class TetrominoFactory
 {
@@ -11,6 +11,10 @@ public class TetrominoFactory
     private Point position;
     private Boolean isRandomColor;
 
+    /**
+     * Creates new tetromino factory for user in multiplayer games with one color.
+     * @param position
+     */
     public TetrominoFactory(Integer position)
     {
         this.isRandomColor = false;
@@ -18,6 +22,9 @@ public class TetrominoFactory
         setPosition(position);
     }
 
+    /**
+     * Creates tetromino factory for single player game returns tetrominos with random color.
+     */
     public TetrominoFactory()
     {
         this.color = null;
@@ -25,6 +32,10 @@ public class TetrominoFactory
         setPosition(1);
     }
 
+    /**
+     * Method setting up new tetromino position based on user position on game panel.
+     * @param positionNumber
+     */
     private void setPosition(int positionNumber)
     {
         switch (positionNumber)
@@ -44,6 +55,10 @@ public class TetrominoFactory
         }
     }
 
+    /**
+     * Returns new tetromino.
+     * @return
+     */
     public Tetromino getNewTetromino()
     {
         Color tetrominoColor = null;

@@ -4,7 +4,7 @@ import main.java.com.tetrismultiplayer.server.engine.user.RemoteUser;
 import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
 
 /**
- * Created by Marcin on 2016-02-16.
+ * Class and thread for cooperation game.
  */
 public class CooperationGame extends ParentGameEngine
 {
@@ -13,6 +13,11 @@ public class CooperationGame extends ParentGameEngine
         super(GameStatus.WAITING, ownerUser, mainPanel, gameSpeed, GameType.COOPERATION, playersNumber);
     }
 
+    /**
+     * Main cooperation game thread for cooperation game. Maintains all users connected to game.
+     * @return null
+     * @throws InterruptedException
+     */
     public Object doInBackground() throws InterruptedException
     {
         mainPanel.writeLineInTextArea("Nowa gra wspolna utworzona przez uzytkownika "

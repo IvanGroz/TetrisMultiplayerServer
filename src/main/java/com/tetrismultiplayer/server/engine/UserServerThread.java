@@ -21,6 +21,9 @@ import javax.swing.*;
 import java.util.LinkedList;
 import java.util.Map;
 
+/**
+ * Class listening to user messages and performing selected work.
+ */
 public class UserServerThread extends SwingWorker<Boolean, Object>
 {
     private RemoteUser user;
@@ -35,6 +38,10 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
         this.user = user;
     }
 
+    /**
+     * Main running method receiving messages from user and performing selected job.
+     * @return
+     */
     @Override
     protected Boolean doInBackground()
     {
@@ -64,6 +71,10 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
         return true;
     }
 
+    /**
+     * Method connecting user to selected game
+     * @param newMsg
+     */
     private void connectToGame(JSONObject newMsg)
     {
         ParentGameEngine newGame = main.getMainServerThread().getGamesList().get(newMsg.getString("identifier"));
@@ -71,6 +82,9 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
         newGame.addUser(user);
     }
 
+    /**
+     * Method sending to user list of waiting multiplayer games.
+     */
     private void sendWaitingGames()
     {
         JSONObject gamesWaiting = new JSONObject().put("cmd", "setGamesList");
@@ -106,6 +120,10 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
 
     }
 
+    /**
+     * Method starting new selected by user game.
+     * @param newMsg
+     */
     private void startNewGame(JSONObject newMsg)
     {
         if (main.getMainServerThread().getGamesList().size() < main.maxGames)
@@ -158,6 +176,10 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
         }
     }
 
+    /**
+     * Method adding game to database after game is finished.
+     * @param game
+     */
     private void addGameToDb(ParentGameEngine game)
     {
         GameDTO newGameInDb = new GameDTO();
@@ -192,6 +214,10 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
         }
     }
 
+    /**
+     * Method forwarding move to user game move queue.
+     * @param newMsg
+     */
     private void forwardMove(JSONObject newMsg)
     {
         String key = newMsg.getString("key");
@@ -217,6 +243,9 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
         }
     }
 
+    /**
+     * Method closing connection with user after finishing thread.
+     */
     @Override
     protected void done()
     {

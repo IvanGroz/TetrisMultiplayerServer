@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 /**
- * Created by Marcin on 2016-02-16.
+ * Abstract class for all game engies.
  */
 public abstract class ParentGameEngine extends SwingWorker<Object, Object>
 {
@@ -93,6 +93,10 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         return columnNumber;
     }
 
+    /**
+     * Checks movequeue and if isn't empty checks if move can be dane and executes it.
+     * @param isConcurrent type of game
+     */
     protected void checkPlayersMove(boolean isConcurrent)
     {
         if (!moveQueue.isEmpty())
@@ -141,6 +145,13 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         }
     }
 
+    /**
+     * Checks if new move can be done without collision.
+     * @param tetromino moved tetromino
+     * @param previousTetromino tetromino before move
+     * @param isUserMove true if user moves block, false if game drops block
+     * @return true if collision won't happen
+     */
     protected boolean isCollision(Tetromino tetromino, Tetromino previousTetromino, boolean isUserMove)
     {
         for (Brick brick : tetromino.getBricksList())
@@ -169,6 +180,9 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         return false;
     }
 
+    /**
+     * Method moving down all active users blocks.
+     */
     protected void moveDownAllActiveBlocks()
     {
         usersList.forEach(user -> {
@@ -184,6 +198,11 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         });
     }
 
+    /**
+     * Method placing new tetromino
+     * @param user reference to user
+     * @return true if tetromino can be placed without collision
+     */
     protected boolean placeNewTetromino(RemoteUser user)
     {
         Tetromino newTetromino = user.getNewTetromino();
@@ -206,6 +225,11 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         return true;
     }
 
+    /**
+     * Method checking user active blocks if they are still active
+     * @param remoteUser user reference
+     * @return true if block is inactive
+     */
     protected boolean checkForInactiveBlock(RemoteUser remoteUser)
     {
         LinkedList<Tetromino> allTetrominosCopy = (LinkedList<Tetromino>) allTetrominos.clone();
@@ -229,6 +253,10 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         return false;
     }
 
+    /**
+     * Method adding user to game.
+     * @param user
+     */
     public void addUser(RemoteUser user)
     {
         if (usersList.size() < playersNumber)
@@ -249,6 +277,10 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         }
     }
 
+    /**
+     * Method used in multiplayer games waiting for selected number of users to connect
+     * @return true if selected number of users connected before timetou
+     */
     protected boolean waitForUsers()
     {
         int timeoutCounter = 59;
@@ -326,6 +358,11 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         return identifier;
     }
 
+    /**
+     * Method checking if any line can be cleared.
+     * @param position -1 if cooperation or single game else user position
+     * @return list of lines to clear
+     */
     protected LinkedList<Integer> checkForLineToClear(Integer position)
     {
         int minColumn;
@@ -381,6 +418,11 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         return linesToDelete;
     }
 
+    /**
+     * Clears selected line
+     * @param linesToClear number of lines to clear
+     * @param position -1 if cooperation or single game else user position
+     */
     protected void clearLine(LinkedList<Integer> linesToClear, Integer position)
     {
         int minColumn;

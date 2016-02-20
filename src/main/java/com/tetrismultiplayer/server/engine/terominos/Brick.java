@@ -3,7 +3,7 @@ package main.java.com.tetrismultiplayer.server.engine.terominos;
 import java.awt.*;
 
 /**
- * Created by Marcin on 2016-02-16.
+ * Class for single brick from tetromino.
  */
 public class Brick
 {
@@ -19,16 +19,30 @@ public class Brick
         this.size = new Dimension(LENGTH, LENGTH);
     }
 
+    /**
+     * Moves brick desired rows and columns number.
+     * @param x rows number
+     * @param y columns number
+     */
     public void moveBrick(int x, int y)
     {
         position = new Point(position.x + x, position.y + y);
     }
 
+    /**
+     * Sets new location to brick.
+     * @param x
+     * @param y
+     */
     public void setNewLocation(int x, int y)
     {
         position = new Point(x, y);
     }
 
+    /**
+     * Returns actual brick position.
+     * @return
+     */
     public Point getPosition()
     {
         return position;

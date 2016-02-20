@@ -23,6 +23,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Class for main server thread connecting and disconnecting new users and maintaining running games
+ */
 public class MainServerThread extends SwingWorker<Object, Object>
 {
     private Main main;
@@ -49,6 +52,10 @@ public class MainServerThread extends SwingWorker<Object, Object>
         this.gamesList = new HashMap<>();
     }
 
+    /**
+     * Main server method accepting new connections from users.
+     * @return
+     */
     @Override
     protected Object doInBackground()
     {
@@ -87,9 +94,16 @@ public class MainServerThread extends SwingWorker<Object, Object>
         return null;
     }
 
+    /**
+     * Method accepting new user connection and starting independend user listener thread.
+     * @param nick
+     * @param identifier
+     * @param ip
+     * @param socket
+     */
     private void acceptNewConnection(String nick, String identifier, String ip, Socket socket)
     {
-	addUserToDatabase(nick);
+        addUserToDatabase(nick);
         RemoteUser newUser = new RemoteUser(nick, identifier, ip, socket, "Połączony", getUserRankingInd(nick));
         usersList.add(newUser);
         UserServerThread userThread = new UserServerThread(main, newUser, mainPanel);
@@ -105,56 +119,80 @@ public class MainServerThread extends SwingWorker<Object, Object>
         mainPanel.setActivePlayersNumber(clientsNumber.incrementAndGet());
     }
 
+    /**
+     * Method adding user to database.
+     * @param nick
+     */
     private void addUserToDatabase(String nick)
     {
-	UserDTO user = new UserDTO();
-	try
-	{
-	    user = new UserDAO(main.getEntityManagerFactory()).getUserByNickname(nick);
-	}
-	catch (Exception e)
-	{
-	    user.setName(nick);
-	    new UserDAO(main.getEntityManagerFactory()).insert(user);
-	}
+        UserDTO user = new UserDTO();
+        try
+        {
+            user = new UserDAO(main.getEntityManagerFactory()).getUserByNickname(nick);
+        }
+        catch (Exception e)
+        {
+            user.setName(nick);
+            new UserDAO(main.getEntityManagerFactory()).insert(user);
+        }
     }
 
+    /**
+     * Method getting user ranking in single game.
+     * @param nick
+     * @return
+     */
     private int getUserRankingInd(String nick)
     {
-	try
-	{
-	    return Collections.max(new UserDAO(main.getEntityManagerFactory()).getUsersInvScores(nick));
-	}
-	catch (Exception e)
-	{
-	    return 0;
-	}
+        try
+        {
+            return Collections.max(new UserDAO(main.getEntityManagerFactory()).getUsersInvScores(nick));
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
     }
 
+    /**
+     * Method getting user ranking in cooperation game
+     * @param nick
+     * @return
+     */
     private int getUserRankingCoop(String nick)
     {
-	try
-	{
-	    return Collections.max(new UserDAO(main.getEntityManagerFactory()).getUsersCoopScores(nick));
-	}
-	catch (Exception e)
-	{
-	    return 0;
-	}
+        try
+        {
+            return Collections.max(new UserDAO(main.getEntityManagerFactory()).getUsersCoopScores(nick));
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
     }
 
+    /**
+     * Method getting user ranking in cooperation game.
+     * @param nick
+     * @return
+     */
     private int getUserRankingConc(String nick)
     {
-	try
-	{
-	    return Collections.max(new UserDAO(main.getEntityManagerFactory()).getUsersConcScores(nick));
-	}
-	catch (Exception e)
-	{
-	    return 0;
-	}
+        try
+        {
+            return Collections.max(new UserDAO(main.getEntityManagerFactory()).getUsersConcScores(nick));
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
     }
 
+    /**
+     * Method rejecting new user connection if too many users are already connected
+     * @param socket
+     * @throws IOException
+     */
     private void rejectNewConnection(Socket socket) throws IOException
     {
         JSONObject rejectedObj = new JSONObject();
@@ -164,6 +202,9 @@ public class MainServerThread extends SwingWorker<Object, Object>
                 "Polaczenie odrzucone, przekroczona maksymalna ilosc klientow: " + maxUserThreads);
     }
 
+    /**
+     * Method changin button status to default.
+     */
     private void changeBtnStatus()
     {
         mainPanel.setStartBtnStatus(true);
@@ -172,6 +213,9 @@ public class MainServerThread extends SwingWorker<Object, Object>
         mainPanel.getPortTextField().setEditable(true);
     }
 
+    /**
+     * Method executed after closing server thread, closing all games and user threads.
+     */
     @Override
     protected void done()
     {
@@ -198,9 +242,12 @@ public class MainServerThread extends SwingWorker<Object, Object>
         return gamesList;
     }
 
+    /**
+     * Method adding new game to games list
+     * @param game
+     */
     public void addNewGame(ParentGameEngine game)
     {
-        System.out.println("dodano nowa gre " + game.getOwnerUser());
         gamesList.put(game.getIdentifier(), game);
     }
 }

@@ -10,7 +10,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.concurrent.ExecutionException;
 
-public class Main implements Runnable {
+/**
+ * Main server class starts server thread and connects to database.
+ */
+public class Main implements Runnable
+{
     private MainFrame mainFrame;
     private EntityManagerFactory entityManagerFactory;
     private MainPanel mainPanel;
@@ -18,40 +22,56 @@ public class Main implements Runnable {
     public static Integer maxUsers = 10;
     public static Integer maxGames = 5;
 
-    private Main() {
+    private Main()
+    {
         this.mainFrame = new MainFrame(this);
         this.mainPanel = mainFrame.getMainPanel();
     }
 
-    public static void main(String args[]) {
+    public static void main(String args[])
+    {
         new Main().run();
     }
 
     @Override
-    public void run() {
+    public void run()
+    {
         mainFrame.setVisible(true);
         mainPanel.setStartBtnStatus(true);
         mainPanel.setRankingBtnStatus(true);
         connectToDB();
     }
 
-    private void connectToDB() {
+    /**
+     * Method starting thread connecting server to database.
+     */
+    private void connectToDB()
+    {
         ConnectToDB task = new ConnectToDB(mainPanel);
-        task.addPropertyChangeListener(new PropertyChangeListener() {
+        task.addPropertyChangeListener(new PropertyChangeListener()
+        {
             @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (task.isDone()) {
-                    try {
+            public void propertyChange(PropertyChangeEvent evt)
+            {
+                if (task.isDone())
+                {
+                    try
+                    {
                         entityManagerFactory = task.get();
-                        if (entityManagerFactory != null) {
+                        if (entityManagerFactory != null)
+                        {
                             mainPanel.setStartBtnStatus(true);
                             mainPanel.setRankingBtnStatus(true);
                             mainPanel.writeLineInTextArea("Polaczenie z baza danych zostalo nawiazane.");
-                        } else {
+                        }
+                        else
+                        {
                             mainPanel.writeLineInTextArea("Podczas laczenia z baza danych wystapil blad,"
                                     + " zrestartuj program aby sprobowac ponownie.");
                         }
-                    } catch (ExecutionException | InterruptedException e) {
+                    }
+                    catch (ExecutionException | InterruptedException e)
+                    {
                         mainPanel.writeLineInTextArea("Podczas laczenia z baza wystapil blad.");
                         e.printStackTrace();
                     }
@@ -62,19 +82,23 @@ public class Main implements Runnable {
         task.execute();
     }
 
-    public MainServerThread getMainServerThread() {
+    public MainServerThread getMainServerThread()
+    {
         return mainServerThread;
     }
 
-    public void setMainServerThread(MainServerThread mainServerThread) {
+    public void setMainServerThread(MainServerThread mainServerThread)
+    {
         this.mainServerThread = mainServerThread;
     }
 
-    public EntityManagerFactory getEntityManagerFactory() {
+    public EntityManagerFactory getEntityManagerFactory()
+    {
         return entityManagerFactory;
     }
 
-    public MainPanel getMainPanel() {
+    public MainPanel getMainPanel()
+    {
         return mainPanel;
     }
 }

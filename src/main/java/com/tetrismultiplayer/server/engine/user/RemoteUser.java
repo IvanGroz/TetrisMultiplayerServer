@@ -12,7 +12,7 @@ import java.net.Socket;
 import java.util.LinkedList;
 
 /**
- * Created by Marcin on 2016-02-16.
+ * Class representing remote user connected to server.
  */
 public class RemoteUser
 {
@@ -51,12 +51,20 @@ public class RemoteUser
         }
     }
 
+    /**
+     * Method sending json to user.
+     * @param json
+     */
     public void sendToUser(JSONObject json)
     {
         System.out.println("wyslano: " + getIdentifier() + " " + json);
         out.println(json);
     }
 
+    /**
+     * Method receiving json from user.
+     * @return
+     */
     public JSONObject readJSON()
     {
         try
@@ -72,6 +80,9 @@ public class RemoteUser
         return null;
     }
 
+    /**
+     * Method closing connection with user.
+     */
     public void closeConnection()
     {
         try
@@ -85,6 +96,10 @@ public class RemoteUser
         }
     }
 
+    /**
+     * Method returning active user tetromino (still moving)
+     * @return
+     */
     public Tetromino getActiveTetromino()
     {
         return activeTetromino;
@@ -161,9 +176,9 @@ public class RemoteUser
         return score;
     }
 
-    public void addScore(Integer ranking)
+    public void addScore(Integer score)
     {
         this.score += score;
-        this.ranking += score;
+        if (this.ranking < score) this.ranking = score;
     }
 }

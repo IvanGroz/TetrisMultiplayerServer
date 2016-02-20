@@ -5,6 +5,9 @@ import main.java.com.tetrismultiplayer.server.gui.panel.ConnectionsPanel;
 
 import javax.swing.*;
 
+/**
+ * Connections frame.
+ */
 public class ConnectionsFrame extends JFrame
 {
     private static final long serialVersionUID = -2715354987475235043L;

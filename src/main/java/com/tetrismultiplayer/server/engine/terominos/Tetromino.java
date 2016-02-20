@@ -87,6 +87,10 @@ public abstract class Tetromino
         position.move(position.x, position.y + rowsNumber);
     }
 
+    /**
+     * Method parsing tetromino to json used in creating new tetrominos.
+     * @return
+     */
     public JSONObject toJSON()
     {
         return new JSONObject().put("row", position.x).put("column", position.y)
@@ -118,6 +122,11 @@ public abstract class Tetromino
         return type;
     }
 
+    /**
+     * Static method copying tetromino.
+     * @param tetromino
+     * @return
+     */
     public static Tetromino getTetrominoCopy(Tetromino tetromino)
     {
         TetrominoType type = tetromino.getType();

@@ -1,7 +1,7 @@
 package main.java.com.tetrismultiplayer.server.engine.user;
 
 /**
- * Created by Marcin on 2016-02-16.
+ * Class representing one of user moves that will be added to move queue.
  */
 public class UserMove
 {
