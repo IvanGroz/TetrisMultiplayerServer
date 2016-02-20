@@ -28,6 +28,7 @@ public class RemoteUser
     private Tetromino activeTetromino;
     private TetrominoFactory tetrominoFactory;
     private Integer ranking;
+    private Integer score;
 
     public RemoteUser(String nick, String identifier, String ip, Socket socket, String status)
     {
@@ -37,6 +38,7 @@ public class RemoteUser
         this.status = status;
         this.ranking = 0;//TODO: dorobic wczytywanie rankingu
         this.tetrominos = new LinkedList<>();
+        this.score = 0;
         try
         {
             this.socket = socket;
@@ -144,8 +146,24 @@ public class RemoteUser
         return ranking;
     }
 
+    public void clearScore()
+    {
+        score = 0;
+    }
+
     public void setRanking(Integer ranking)
     {
         this.ranking = ranking;
+    }
+
+    public Integer getScore()
+    {
+        return score;
+    }
+
+    public void addScore(Integer ranking)
+    {
+        this.score += score;
+        this.ranking += score;
     }
 }
