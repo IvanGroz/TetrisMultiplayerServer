@@ -102,41 +102,53 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
 
     private void startNewGame(JSONObject newMsg)
     {
-        ParentGameEngine.GameSpeed gameSpeed = ParentGameEngine.GameSpeed.NORMAL;
-        switch (newMsg.getString("difficultyLvl"))
-        {
-            case "easy":
-                gameSpeed = ParentGameEngine.GameSpeed.SLOW;
-                break;
-            case "normal":
-                gameSpeed = ParentGameEngine.GameSpeed.NORMAL;
-                break;
-            case "hard":
-                gameSpeed = ParentGameEngine.GameSpeed.FAST;
-                break;
-        }
-        switch (newMsg.getString("gameType"))
-        {
-            case "single":
-                user.sendToUser(new JSONObject().put("cmd", "gameStarted").put("type", "single"));
-                game = new SingleGame(user, mainPanel, gameSpeed);
-                break;
-            case "concurrent":
-                game = new ConcurrentGame(user, mainPanel, gameSpeed, newMsg.getInt("pNumber"));
-                break;
-            case "cooperation":
-                game = new CooperationGame(user, mainPanel, gameSpeed, newMsg.getInt("pNumber"));
-                break;
-        }
-        main.getMainServerThread().addNewGame(game);
-        game.addPropertyChangeListener(propertyChange -> {
-            if (game.isDone())
-            {
-                game.getUsersList().forEach(user -> user.getTetrominos().clear());
-                main.getMainServerThread().getGamesList().remove(game);
-            }
-        });
-        game.execute();
+	if(main.getMainServerThread().getGamesList().size() < main.maxGames)
+	{
+	    ParentGameEngine.GameSpeed gameSpeed = ParentGameEngine.GameSpeed.NORMAL;
+	    switch (newMsg.getString("difficultyLvl"))
+	    {
+	    case "easy":
+		gameSpeed = ParentGameEngine.GameSpeed.SLOW;
+		break;
+	    case "normal":
+		gameSpeed = ParentGameEngine.GameSpeed.NORMAL;
+		break;
+	    case "hard":
+		gameSpeed = ParentGameEngine.GameSpeed.FAST;
+		break;
+	    }
+	    switch (newMsg.getString("gameType"))
+	    {
+	    case "single":
+		user.sendToUser(new JSONObject().put("cmd", "gameStarted").put("type", "single"));
+		game = new SingleGame(user, mainPanel, gameSpeed);
+		break;
+	    case "concurrent":
+		game = new ConcurrentGame(user, mainPanel, gameSpeed, newMsg.getInt("pNumber"));
+		break;
+	    case "cooperation":
+		game = new CooperationGame(user, mainPanel, gameSpeed, newMsg.getInt("pNumber"));
+		break;
+	    }
+	    main.getMainServerThread().addNewGame(game);
+	    game.addPropertyChangeListener(propertyChange -> {
+		if (game.isDone())
+		{
+		    game.getUsersList().forEach(user -> user.getTetrominos().clear());
+		    main.getMainServerThread().getGamesList().remove(game.getIdentifier());
+		    mainPanel.setActiveGamesNumber(main.getMainServerThread().getGamesList().size());
+		}
+	    });
+	    mainPanel.setActiveGamesNumber(main.getMainServerThread().getGamesList().size());
+	    game.execute();
+	}
+        else
+	{
+	    JSONObject fullGames = new JSONObject().put("cmd", "isFullGames");
+	    user.sendToUser(fullGames);
+	    mainPanel.writeLineInTextArea(
+			    "Polecenie rozpoczęcia gry odrzucone, przekroczona maksymalna ilosc gier: " + main.maxGames);
+	}
     }
 
     private void forwardMove(JSONObject newMsg)
