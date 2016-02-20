@@ -436,6 +436,25 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
             });
             usersList.forEach(user -> user.sendToUser(new JSONObject()
                     .put("cmd", "clearLine").put("position", position).put("row", line)));
+
+            if (position == -1)
+            {
+                usersList.forEach(user -> {
+                    user.sendToUser(new JSONObject().put("cmd", "addScore").put("score", 100 * linesToClear.size())
+                            .put("identifier", user.getIdentifier()));
+                    user.addScore(100 * linesToClear.size());
+                });
+            }
+            else
+            {
+                RemoteUser thisUser = usersList.get(position);
+                thisUser.addScore(100 * linesToClear.size());
+                usersList.forEach(user ->
+                {
+                    user.sendToUser(new JSONObject().put("cmd", "addScore").put("score", 100 * linesToClear.size())
+                            .put("identifier", thisUser.getIdentifier()));
+                });
+            }
         });
         if (!linesToClear.isEmpty())
         {

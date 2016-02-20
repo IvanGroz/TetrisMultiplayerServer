@@ -108,88 +108,88 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
 
     private void startNewGame(JSONObject newMsg)
     {
-	if(main.getMainServerThread().getGamesList().size() < main.maxGames)
-	{
-	    ParentGameEngine.GameSpeed gameSpeed = ParentGameEngine.GameSpeed.NORMAL;
-	    switch (newMsg.getString("difficultyLvl"))
-	    {
-	    case "easy":
-		gameSpeed = ParentGameEngine.GameSpeed.SLOW;
-		break;
-	    case "normal":
-		gameSpeed = ParentGameEngine.GameSpeed.NORMAL;
-		break;
-	    case "hard":
-		gameSpeed = ParentGameEngine.GameSpeed.FAST;
-		break;
-	    }
-	    switch (newMsg.getString("gameType"))
-	    {
-	    case "single":
-		user.sendToUser(new JSONObject().put("cmd", "gameStarted").put("type", "single"));
-		game = new SingleGame(user, mainPanel, gameSpeed);
-		break;
-	    case "concurrent":
-		game = new ConcurrentGame(user, mainPanel, gameSpeed, newMsg.getInt("pNumber"));
-		break;
-	    case "cooperation":
-		game = new CooperationGame(user, mainPanel, gameSpeed, newMsg.getInt("pNumber"));
-		break;
-	    }
-	    main.getMainServerThread().addNewGame(game);
-	    game.addPropertyChangeListener(propertyChange -> {
-		if (game.isDone())
-		{
-		    addGameToDb(game);
-		    game.getUsersList().forEach(user -> user.getTetrominos().clear());
-		    main.getMainServerThread().getGamesList().remove(game.getIdentifier());
-		    mainPanel.setActiveGamesNumber(main.getMainServerThread().getGamesList().size());
-		}
-	    });
-	    mainPanel.setActiveGamesNumber(main.getMainServerThread().getGamesList().size());
-	    game.execute();
-	}
+        if (main.getMainServerThread().getGamesList().size() < main.maxGames)
+        {
+            ParentGameEngine.GameSpeed gameSpeed = ParentGameEngine.GameSpeed.NORMAL;
+            switch (newMsg.getString("difficultyLvl"))
+            {
+                case "easy":
+                    gameSpeed = ParentGameEngine.GameSpeed.SLOW;
+                    break;
+                case "normal":
+                    gameSpeed = ParentGameEngine.GameSpeed.NORMAL;
+                    break;
+                case "hard":
+                    gameSpeed = ParentGameEngine.GameSpeed.FAST;
+                    break;
+            }
+            switch (newMsg.getString("gameType"))
+            {
+                case "single":
+                    user.sendToUser(new JSONObject().put("cmd", "gameStarted").put("type", "single"));
+                    game = new SingleGame(user, mainPanel, gameSpeed);
+                    break;
+                case "concurrent":
+                    game = new ConcurrentGame(user, mainPanel, gameSpeed, newMsg.getInt("pNumber"));
+                    break;
+                case "cooperation":
+                    game = new CooperationGame(user, mainPanel, gameSpeed, newMsg.getInt("pNumber"));
+                    break;
+            }
+            main.getMainServerThread().addNewGame(game);
+            game.addPropertyChangeListener(propertyChange -> {
+                if (game.isDone())
+                {
+                    addGameToDb(game);
+                    game.getUsersList().forEach(user -> user.getTetrominos().clear());
+                    main.getMainServerThread().getGamesList().remove(game.getIdentifier());
+                    mainPanel.setActiveGamesNumber(main.getMainServerThread().getGamesList().size());
+                }
+            });
+            mainPanel.setActiveGamesNumber(main.getMainServerThread().getGamesList().size());
+            game.execute();
+        }
         else
-	{
-	    JSONObject fullGames = new JSONObject().put("cmd", "isFullGames");
-	    user.sendToUser(fullGames);
-	    mainPanel.writeLineInTextArea(
-			    "Polecenie rozpoczęcia gry odrzucone, przekroczona maksymalna ilosc gier: " + main.maxGames);
-	}
+        {
+            JSONObject fullGames = new JSONObject().put("cmd", "isFullGames");
+            user.sendToUser(fullGames);
+            mainPanel.writeLineInTextArea(
+                    "Polecenie rozpoczęcia gry odrzucone, przekroczona maksymalna ilosc gier: " + main.maxGames);
+        }
     }
 
     private void addGameToDb(ParentGameEngine game)
     {
-	GameDTO newGameInDb = new GameDTO();
-	Long date = System.currentTimeMillis();
-	newGameInDb.setGameDate(date);
-	newGameInDb.setGameType(game.getGameType().name());
-	LinkedList<UserDTO> users = new LinkedList<UserDTO>();
+        GameDTO newGameInDb = new GameDTO();
+        Long date = System.currentTimeMillis();
+        newGameInDb.setGameDate(date);
+        newGameInDb.setGameType(game.getGameType().name());
+        LinkedList<UserDTO> users = new LinkedList<UserDTO>();
 
-	for(int i = 0; i < game.getPlayersNumber(); i++)
-	{
-	    UserDTO user = new UserDTO();
-	    user.setName(game.getUsersList().get(i).getNick());
-	    users.add(user);
-	}
-	LinkedList<ScoreDTO> scores = new LinkedList<ScoreDTO>();
-	for(int i = 0; i < game.getPlayersNumber(); i++)
-	{
-	    ScoreDTO score = new ScoreDTO();
-	    score.setScore(game.getUsersList().get(i).getScore());
-	    scores.add(score);
-	}
-	newGameInDb.setScore(scores);
-	new GameDAO(main.getEntityManagerFactory()).insert(newGameInDb);
+        for (int i = 0; i < game.getPlayersNumber(); i++)
+        {
+            UserDTO user = new UserDTO();
+            user.setName(game.getUsersList().get(i).getNick());
+            users.add(user);
+        }
+        LinkedList<ScoreDTO> scores = new LinkedList<ScoreDTO>();
+        for (int i = 0; i < game.getPlayersNumber(); i++)
+        {
+            ScoreDTO score = new ScoreDTO();
+            score.setScore(game.getUsersList().get(i).getScore());
+            scores.add(score);
+        }
+        newGameInDb.setScore(scores);
+        new GameDAO(main.getEntityManagerFactory()).insert(newGameInDb);
 
-	for(int i = 0; i < game.getPlayersNumber(); i++)
-	{
-	    ScoreDTO score = new ScoreDTO();
-	    score.setScore(game.getUsersList().get(i).getScore());
-	    score.setGame(new GameDAO(main.getEntityManagerFactory()).getGameByDate(date));
-	    score.setPlayer(users);
-	    new ScoreDAO(main.getEntityManagerFactory()).insert(score);
-	}
+        for (int i = 0; i < game.getPlayersNumber(); i++)
+        {
+            ScoreDTO score = new ScoreDTO();
+            score.setScore(game.getUsersList().get(i).getScore());
+            score.setGame(new GameDAO(main.getEntityManagerFactory()).getGameByDate(date));
+            score.setPlayer(users);
+            new ScoreDAO(main.getEntityManagerFactory()).insert(score);
+        }
     }
 
     private void forwardMove(JSONObject newMsg)
