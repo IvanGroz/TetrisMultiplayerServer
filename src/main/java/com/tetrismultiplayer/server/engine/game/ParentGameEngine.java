@@ -14,6 +14,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 /**
  * Created by Marcin on 2016-02-16.
@@ -92,7 +93,7 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         return columnNumber;
     }
 
-    protected void checkPlayersMove()
+    protected void checkPlayersMove(boolean isConcurrent)
     {
         if (!moveQueue.isEmpty())
         {
@@ -125,7 +126,8 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
                 else if (newMove.getMove() == (Move.LEFT)) tetrominoCopy.moveLeft();
                 else if (newMove.getMove() == (Move.RIGHT)) tetrominoCopy.moveRight();
                 else if (newMove.getMove() == (Move.ROTATE)) tetrominoCopy.rotate();
-                if (!isCollision(tetrominoCopy, previousTetromino, true))
+                if (!isCollision(tetrominoCopy, previousTetromino, true)
+                        && (!isConcurrent || previousTetromino.getPosition().y > 3))
                 {
                     if (newMove.getMove().equals(Move.DOWN)) previousTetromino.moveDown();
                     else if (newMove.getMove().equals(Move.LEFT)) previousTetromino.moveLeft();
@@ -324,12 +326,30 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         return identifier;
     }
 
-    protected LinkedList<Integer> checkForLineToClear()
+    protected LinkedList<Integer> checkForLineToClear(Integer position)
     {
+        int minColumn;
+        int maxColumn;
+        if (position == -1)
+        {
+            minColumn = 0;
+            maxColumn = getColumnNumber();
+        }
+        else
+        {
+            minColumn = position * 10;
+            maxColumn = (position + 1) * 10;
+        }
         LinkedList<Integer> linesToDelete = new LinkedList<>();
         LinkedList<Brick> allBricks = new LinkedList<>();
         LinkedList<Tetromino> allTetrominosCopy = (LinkedList<Tetromino>) allTetrominos.clone();
-        usersList.forEach(user -> allTetrominosCopy.remove(user.getActiveTetromino()));
+        allTetrominosCopy = allTetrominosCopy.stream()
+                .filter(f -> (f.getPosition().x >= minColumn && f.getPosition().x <= maxColumn))
+                .collect(Collectors.toCollection(LinkedList<Tetromino>::new));
+        for (RemoteUser user : usersList)
+        {
+            allTetrominosCopy.remove(user.getActiveTetromino());
+        }
 
         for (Tetromino tetromino : allTetrominosCopy)
         {
@@ -347,7 +367,7 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
             if (allBricks.get(i).getPosition().y == allBricks.get(i + 1).getPosition().y)
             {
                 counter++;
-                if (counter == getColumnNumber())
+                if (counter == (position == -1 ? getColumnNumber() : 10))
                 {
                     linesToDelete.add(allBricks.get(i).getPosition().y);
                     counter = 1;
@@ -361,25 +381,40 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
         return linesToDelete;
     }
 
-    protected void clearLine(LinkedList<Integer> linesToClear)
+    protected void clearLine(LinkedList<Integer> linesToClear, Integer position)
     {
+        int minColumn;
+        int maxColumn;
+        if (position == -1)
+        {
+            minColumn = 0;
+            maxColumn = getColumnNumber();
+        }
+        else
+        {
+            minColumn = position * 10;
+            maxColumn = (position + 1) * 10;
+        }
         linesToClear.forEach(line ->
         {
             usersList.forEach(user -> {
                 LinkedList<Tetromino> tetrominos = user.getTetrominos();
                 for (int i = 0; i < tetrominos.size(); i++)
                 {
-                    LinkedList<Brick> bricks = tetrominos.get(i).getBricksList();
-                    for (int j = 0; j < bricks.size(); j++)
+                    if (tetrominos.get(i).getPosition().x >= minColumn && tetrominos.get(i).getPosition().x <= maxColumn)
                     {
-                        if (bricks.get(j).getPosition().y == line)
+                        LinkedList<Brick> bricks = tetrominos.get(i).getBricksList();
+                        for (int j = 0; j < bricks.size(); j++)
                         {
-                            tetrominos.get(i).removeBrick(bricks.get(j));
-                            j--;
-                            if (tetrominos.get(i).getBricksList().isEmpty())
+                            if (bricks.get(j).getPosition().y == line)
                             {
-                                user.removeTetromino(tetrominos.get(i));
-                                i--;
+                                tetrominos.get(i).removeBrick(bricks.get(j));
+                                j--;
+                                if (tetrominos.get(i).getBricksList().isEmpty())
+                                {
+                                    user.removeTetromino(tetrominos.get(i));
+                                    i--;
+                                }
                             }
                         }
                     }
@@ -388,20 +423,23 @@ public abstract class ParentGameEngine extends SwingWorker<Object, Object>
 
             usersList.forEach(user -> {
                 user.getTetrominos().forEach(tetromino -> {
-                    LinkedList<Brick> bricks = tetromino.getBricksList();
-                    bricks.sort((brick1, brick2) -> Integer.valueOf(brick1.getPosition().y).compareTo(brick2.getPosition().y));
-                    if (bricks.getLast().getPosition().y < line)
+                    if (tetromino.getPosition().x >= minColumn && tetromino.getPosition().x <= maxColumn)
                     {
-                        tetromino.moveDown();
+                        LinkedList<Brick> bricks = tetromino.getBricksList();
+                        bricks.sort((brick1, brick2) -> Integer.valueOf(brick1.getPosition().y).compareTo(brick2.getPosition().y));
+                        if (bricks.getLast().getPosition().y < line)
+                        {
+                            tetromino.moveDown();
+                        }
                     }
                 });
             });
             usersList.forEach(user -> user.sendToUser(new JSONObject()
-                    .put("cmd", "clearLine").put("position", -1).put("row", line)));
+                    .put("cmd", "clearLine").put("position", position).put("row", line)));
         });
         if (!linesToClear.isEmpty())
         {
-            System.out.println("usunieto " + linesToClear.size() + " linii");
+            System.out.println("usunieto " + linesToClear.size() + " linii z pozycji " + position);
         }
     }
 }

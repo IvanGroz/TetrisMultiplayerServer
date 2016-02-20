@@ -19,16 +19,15 @@ public class CooperationGame extends ParentGameEngine
                 + usersList.getFirst().getNick());
         if (waitForUsers())
         {
-            mainPanel.writeLineInTextArea("Gra wspolna id:" + getIdentifier() + "rozpoczeta"
-                    + usersList.getFirst().getNick());
+            mainPanel.writeLineInTextArea("Gra w wspolna id: " + getIdentifier() + " zostala rozpoczeta");
 
             long startFrameTime = System.currentTimeMillis();
             usersList.forEach(user -> placeNewTetromino(user));
             while (true)
             {
-                checkPlayersMove();
+                checkPlayersMove(false);
 
-                clearLine(checkForLineToClear());
+                clearLine(checkForLineToClear(-1),-1);
                 for (RemoteUser user : usersList)
                 {
                     if (checkForInactiveBlock(user))
