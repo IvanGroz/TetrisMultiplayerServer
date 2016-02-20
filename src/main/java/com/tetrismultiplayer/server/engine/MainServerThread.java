@@ -1,6 +1,8 @@
 package main.java.com.tetrismultiplayer.server.engine;
 
 import main.java.com.tetrismultiplayer.server.Main;
+import main.java.com.tetrismultiplayer.server.database.dao.UserDAO;
+import main.java.com.tetrismultiplayer.server.database.dto.UserDTO;
 import main.java.com.tetrismultiplayer.server.engine.game.ParentGameEngine;
 import main.java.com.tetrismultiplayer.server.engine.user.RemoteUser;
 import main.java.com.tetrismultiplayer.server.gui.panel.MainPanel;
@@ -14,6 +16,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.Executor;
@@ -86,7 +89,8 @@ public class MainServerThread extends SwingWorker<Object, Object>
 
     private void acceptNewConnection(String nick, String identifier, String ip, Socket socket)
     {
-        RemoteUser newUser = new RemoteUser(nick, identifier, ip, socket, "Połączony");
+	addUserToDatabase(nick);
+        RemoteUser newUser = new RemoteUser(nick, identifier, ip, socket, "Połączony", getUserRankingInd(nick));
         usersList.add(newUser);
         UserServerThread userThread = new UserServerThread(main, newUser, mainPanel);
         userThread.addPropertyChangeListener(propertyChange -> {
@@ -99,6 +103,56 @@ public class MainServerThread extends SwingWorker<Object, Object>
         userThreadList.add(userThread);
         userThreadExecutor.execute(userThreadList.getLast());
         mainPanel.setActivePlayersNumber(clientsNumber.incrementAndGet());
+    }
+
+    private void addUserToDatabase(String nick)
+    {
+	UserDTO user = new UserDTO();
+	try
+	{
+	    user = new UserDAO(main.getEntityManagerFactory()).getUserByNickname(nick);
+	}
+	catch (Exception e)
+	{
+	    user.setName(nick);
+	    new UserDAO(main.getEntityManagerFactory()).insert(user);
+	}
+    }
+
+    private int getUserRankingInd(String nick)
+    {
+	try
+	{
+	    return Collections.max(new UserDAO(main.getEntityManagerFactory()).getUsersInvScores(nick));
+	}
+	catch (Exception e)
+	{
+	    return 0;
+	}
+    }
+
+    private int getUserRankingCoop(String nick)
+    {
+	try
+	{
+	    return Collections.max(new UserDAO(main.getEntityManagerFactory()).getUsersCoopScores(nick));
+	}
+	catch (Exception e)
+	{
+	    return 0;
+	}
+    }
+
+    private int getUserRankingConc(String nick)
+    {
+	try
+	{
+	    return Collections.max(new UserDAO(main.getEntityManagerFactory()).getUsersConcScores(nick));
+	}
+	catch (Exception e)
+	{
+	    return 0;
+	}
     }
 
     private void rejectNewConnection(Socket socket) throws IOException

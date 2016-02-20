@@ -30,13 +30,13 @@ public class RemoteUser
     private Integer ranking;
     private Integer score;
 
-    public RemoteUser(String nick, String identifier, String ip, Socket socket, String status)
+    public RemoteUser(String nick, String identifier, String ip, Socket socket, String status, Integer ranking)
     {
         this.nick = nick;
         this.identifier = identifier;
         this.ip = ip;
         this.status = status;
-        this.ranking = 0;//TODO: dorobic wczytywanie rankingu
+        this.ranking = ranking;//TODO: dorobic wczytywanie rankingu
         this.tetrominos = new LinkedList<>();
         this.score = 0;
         try

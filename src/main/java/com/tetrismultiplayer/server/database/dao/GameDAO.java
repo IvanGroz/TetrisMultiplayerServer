@@ -6,7 +6,7 @@ import javax.persistence.EntityManagerFactory;
 
 public class GameDAO extends DAOParentClass<GameDTO>
 {
-    protected GameDAO(EntityManagerFactory entityManagerFactory)
+    public GameDAO(EntityManagerFactory entityManagerFactory)
     {
 	super(GameDTO.class, "game", entityManagerFactory);
     }

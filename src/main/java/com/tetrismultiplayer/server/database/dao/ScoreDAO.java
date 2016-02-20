@@ -6,8 +6,10 @@ import javax.persistence.EntityManagerFactory;
 
 public class ScoreDAO extends DAOParentClass<ScoreDTO>
 {
-    protected ScoreDAO(EntityManagerFactory entityManagerFactory)
+    public ScoreDAO(EntityManagerFactory entityManagerFactory)
     {
 	super(ScoreDTO.class, "score", entityManagerFactory);
     }
+
+
 }

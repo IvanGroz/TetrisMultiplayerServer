@@ -1,6 +1,9 @@
 package main.java.com.tetrismultiplayer.server.engine;
 
 import main.java.com.tetrismultiplayer.server.Main;
+import main.java.com.tetrismultiplayer.server.database.dao.GameDAO;
+import main.java.com.tetrismultiplayer.server.database.dto.GameDTO;
+import main.java.com.tetrismultiplayer.server.database.dto.UserDTO;
 import main.java.com.tetrismultiplayer.server.engine.game.ConcurrentGame;
 import main.java.com.tetrismultiplayer.server.engine.game.CooperationGame;
 import main.java.com.tetrismultiplayer.server.engine.game.ParentGameEngine;
@@ -13,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.swing.*;
+import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.Map;
 
 public class UserServerThread extends SwingWorker<Boolean, Object>
@@ -134,6 +139,7 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
 	    game.addPropertyChangeListener(propertyChange -> {
 		if (game.isDone())
 		{
+		    addGameToDb(game);
 		    game.getUsersList().forEach(user -> user.getTetrominos().clear());
 		    main.getMainServerThread().getGamesList().remove(game.getIdentifier());
 		    mainPanel.setActiveGamesNumber(main.getMainServerThread().getGamesList().size());
@@ -149,6 +155,24 @@ public class UserServerThread extends SwingWorker<Boolean, Object>
 	    mainPanel.writeLineInTextArea(
 			    "Polecenie rozpoczęcia gry odrzucone, przekroczona maksymalna ilosc gier: " + main.maxGames);
 	}
+    }
+
+    private void addGameToDb(ParentGameEngine game)
+    {
+	GameDTO newGameInDb = new GameDTO();
+	newGameInDb.setGameDate(Calendar.getInstance().getTime());
+	newGameInDb.setGameType(game.getGameType().name());
+	LinkedList<UserDTO> users = new LinkedList<UserDTO>();
+
+	for(int i = 0; i < game.getPlayersNumber(); i++)
+	{
+	    UserDTO user = new UserDTO();
+	    user.setName(game.getUsersList().get(i).getNick());
+	    users.add(user);
+	}
+	newGameInDb.setPlayer(users);
+
+	new GameDAO(main.getEntityManagerFactory()).insert(newGameInDb);
     }
 
     private void forwardMove(JSONObject newMsg)
